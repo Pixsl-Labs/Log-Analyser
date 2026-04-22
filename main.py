@@ -6,7 +6,7 @@ log_file = input("Please enter the file name that you would like to analyse: ")
 def analyse_logs(log_file):
     failed_count = 0
     ip_counts = {}
-    max_attempts = 2
+    max_attempts = 5
 
     with open(log_file, 'r') as file:
         for line in file:
@@ -22,7 +22,7 @@ def analyse_logs(log_file):
                     failed_count += 1
 
     for ip, count in ip_counts.items():
-        if count == max_attempts:
+        if count >= max_attempts:
             print(f"{ip} has tried {count} times! Please investigate into this IP: {ip}")
         else:
             print(f"{ip} has tried {count} times!")
