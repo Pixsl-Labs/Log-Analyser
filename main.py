@@ -1,15 +1,11 @@
 # source venv/bin/activate
 import re, sys
 
-if len(sys.argv) < 2:
-    print("Usage python main.py <file_path_of_log_file>")
-    sys.exit(1)
-
-if sys.argv[1] == "":
-    log_file = input("Please enter the file name that you would like to analyse: ")
-else:
+if len(sys.argv) > 1:
     log_file = sys.argv[1]
-    
+else:
+    log_file = input("Please enter the file name that you would like to analyse: ")   
+
 print()
 
 class AnalysisOfLogFile:
