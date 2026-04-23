@@ -1,35 +1,77 @@
 # source venv/bin/activate
-import re
+import re, sys
 
-log_file = input("Please enter the file name that you would like to analyse: ")
+if len(sys.argv) < 2:
+    print("Usage python main.py <file_path_of_log_file>")
+    sys.exit(1)
 
-def analyse_logs(log_file):
-    failed_count = 0
-    ip_counts = {}
-    max_attempts = 5
+if sys.argv[1] == "":
+    log_file = input("Please enter the file name that you would like to analyse: ")
+else:
+    log_file = sys.argv[1]
+    
+print()
 
-    with open(log_file, 'r') as file:
-        for line in file:
-            if "failed password" in line.lower():
-                failed_log = line.strip()
-                result = failed_log.partition("from")
-                ip_part = result[2].strip()
-                ip_match = re.search(r'\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b', ip_part)
-                
-                if ip_match:
-                    ip = ip_match.group()
-                    ip_counts[ip] = ip_counts.get(ip, 0) + 1
-                    failed_count += 1
+class AnalysisOfLogFile:
+    def __init__(self):
+        self.failed_count = 0
+        self.success_count = 0
+        self.failed_ip_counts = {}
+        self.successful_logins = []
+        self.max_attempts = 5
+        
+    def analyse(self, file_path):
+        try:
+            with open(file_path, 'r') as file:
+                for line in file:
+                    if "failed password" in line.lower():
+                        self.extract_failed_ip(line)
+                    elif "accepted password" in line.lower() or "session opened" in line.lower():
+                        self.extract_successful_login(line)
+            return True
+        except FileNotFoundError:
+            print(f"Error: The file '{log_file}' was not found.")
+            return False
 
-    for ip, count in ip_counts.items():
-        if count >= max_attempts:
-            print(f"{ip} has tried {count} times! Please investigate into this IP: {ip}")
-        else:
-            print(f"{ip} has tried {count} times!")
+    def extract_failed_ip(self, line):
+        failed_log = line.strip()
+        result = failed_log.partition("from")
+        ip_part = result[2].strip()
+        ip_match = re.search(r'\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b', ip_part)
+        
+        if ip_match:
+            ip = ip_match.group()
+            self.failed_ip_counts[ip] = self.failed_ip_counts.get(ip, 0) + 1
+            self.failed_count += 1
 
-    if failed_count > 5:
-        print("High risk: multiple failed login attempts detected!")
-    elif failed_count > 2:
-        print("Warning: some failed login attempts detected.")
+    def extract_successful_login(self, line):
+        line_lower = line.lower()
+        ip_match = re.search(r'\b(?:from|for .*? from) ([\d\.]+)', line_lower)
+        user_match = re.search(r'for (\w+)', line_lower)
+        ip = ip_match.group(1) if ip_match else "unknown"
+        user = user_match.group(1) if user_match else "unknown"
+        self.successful_logins.append((ip, user))
+        self.success_count += 1
 
-analyse_logs(log_file)
+    def get_suspicious_ips(self):
+        sorted_ips = sorted(self.failed_ip_counts.items(), key=lambda x: x[1], reverse=True)
+        print("Suspicious IPs (failed attempts):")
+        for ip, count in sorted_ips:
+            status = "Investigate" if count >= self.max_attempts else "Low risk"
+            print(f"   {ip} -> {count} attempts ({status})")
+        return sorted_ips
+    
+    def get_successful_logins(self):
+        print("\nSuccessful logins:")
+        for ip, user in self.successful_logins:
+            print(f"   User '{user}' logged in from {ip}")
+        return self.successful_logins
+
+analyser = AnalysisOfLogFile()
+success = analyser.analyse(log_file)
+if success:
+    analyser.get_suspicious_ips()
+    analyser.get_successful_logins()
+else:
+    print()
+    print("Analysis stopped due to missing file.")
