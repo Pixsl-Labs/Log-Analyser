@@ -43,7 +43,29 @@ Or can be ran using the `F5` key, running a json launch file.
 
 # Usage
 
-1. Analyse logs to find out any failed login attempts, revealing the IP address used
+## Log Analyser
+
+All of the below information can be found through the `Log Analysis Menu`, where the user can either select a full report of the log file or can find out specific information based on their requirement.
+
+```
+--- Log Analysis Menu ---
+1. Show full report
+2. Show total failed logins
+3. Show suspicious IPs
+4. Show failed login details
+5. Show successful logins
+6. Show unique IP count
+7. Analyse new file
+8. Exit
+```
+
+Analyse a .log file to find out the following information:
+   1. Number of unique IP address found
+   2. Total number of failed login attempts
+   3. Lists out suspicious IP address which have failed to logged into a user. Revealing the IP address, number of attempts and level of risk associated with that IP address
+   4. Lists out all of the failed login attempts, with information on which user and from which IP address
+   5. Total number of successful login attempts
+   6. List of successful logins, listing the user that was logged into and from which IP address
 
 # Goal
 
