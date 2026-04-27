@@ -59,13 +59,15 @@ All of the below information can be found through the `Log Analysis Menu`, where
 8. Exit
 ```
 
-Analyse a .log file to find out the following information:
+Analyse a `.log` file to find out the following information:
    1. Number of unique IP address found
    2. Total number of failed login attempts
    3. Lists out suspicious IP address which have failed to logged into a user. Revealing the IP address, number of attempts and level of risk associated with that IP address
    4. Lists out all of the failed login attempts, with information on which user and from which IP address
    5. Total number of successful login attempts
    6. List of successful logins, listing the user that was logged into and from which IP address
+   7. Allows the user to select a new `.log` file for analysis
+   8. Allows the user to exit by entering the number `8`
 
 # Goal
 
