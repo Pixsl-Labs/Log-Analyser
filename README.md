@@ -39,6 +39,8 @@ pip install -r requirements.txt
 python3 main.py <log_file_for_analysis>
 ```
 
+Or can be ran using the `F5` key, running a json launch file.
+
 # Usage
 
 1. Analyse logs to find out any failed login attempts, revealing the IP address used
