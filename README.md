@@ -2,7 +2,7 @@
 
 Analyse log files in order to extract any unsuccessful login attempts or successful logins. Returning any detected failed attempts with the associated IP address and number of failed attempts by that IP address. As well as returning all successful login attempts linking it to which user was successfully logged in with adn the associated IP address.
 
-The program can either be ran as normal by running the main.py Python file or can be ran by entering `python3 main.py <log_file_to_be_analysed>`.
+The program can either be ran as normal by running the main.py Python file or can be ran by entering `python3 main.py <log_file_to_be_analysed>` -> (needs updating!).
 
 # Building the Project
 
@@ -71,7 +71,7 @@ Analyse a `.log` file to find out the following information:
 
 # Goal
 
-Analyse system logs and detect suspicious activity (e.g. failed login)
+Analyse system logs and detect suspicious activity (e.g. failed login, brute-force attempts)
 
 # Future Ideas
 

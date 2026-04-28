@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 
 class LogAnalyser:
     def __init__(self):
@@ -40,7 +41,14 @@ class LogAnalyser:
         ip = ip_match.group() if ip_match else "unknown"
         user = user_match.group(1) if user_match else "unknown"
 
-        self.failed_logins.append((ip, user))
+        time_stamp = self.extract_time_stamps(line)
+
+        if time_stamp:
+            dt = datetime.strptime(time_stamp, "%b %d %Y %H:%M:%S")
+        else:
+            dt = None
+
+        self.failed_logins.append((ip, user, dt))
 
         if ip_match:
             self.failed_ip_counts[ip] = self.failed_ip_counts.get(ip, 0) + 1
@@ -54,6 +62,26 @@ class LogAnalyser:
         user = user_match.group(1) if user_match else "unknown"
 
         self.successful_logins.append((ip, user))
+
+    def extract_time_stamps(self, line):
+        match = re.search(r'^\w+\s+\d+\s+\d{4}\s+\d{2}:\d{2}:\d{2}', line)
+        if match:
+            return match.group()
+        return None
+
+    def group_attempts_by_ip(self):
+        ip_attempts = {}
+
+        for ip, user, time_stamp in self.failed_logins:
+            if time_stamp is None:
+                continue
+
+            if ip not in ip_attempts:
+                ip_attempts[ip] = []
+
+            ip_attempts[ip].append(time_stamp)
+
+        return ip_attempts
 
     def reset(self):
         self.failed_logins = []

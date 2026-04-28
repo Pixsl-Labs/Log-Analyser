@@ -15,13 +15,16 @@ class Interaction:
         print("4. Show failed login details")
         print("5. Show successful logins")
         print("6. Show unique IP count")
-        print("7. Analyse new file")
-        print("8. Exit")
+        print("7. Show brute force detection")
+        print("8. Show targeted users")
+        print("9. Show suspicious success")
+        print("10. Analyse new file")
+        print("11. Exit")
 
     def run(self):
         while self.running:
             self.display_menu()
-            choice = input("\nSelect an option (1-8): ").strip()
+            choice = input("\nSelect an option (1-11): ").strip()
 
             if choice == "1":
                 print("\n--- Full Report ---\n")
@@ -36,6 +39,18 @@ class Interaction:
                 print()
 
                 self.reporter.get_failed_logins()
+
+                print()
+
+                self.reporter.get_brute_force_results()
+
+                print()
+
+                self.reporter.get_most_targeted_user()
+
+                print()
+
+                self.reporter.detect_suspicious_success()
 
                 print()
 
@@ -63,11 +78,24 @@ class Interaction:
                 self.reporter.get_total_number_of_unique_ip_addresses()
 
             elif choice == "7":
-                file_path = input("Enter log file path: ")
-                self.analyser.reset()
-                self.analyser.analyse(file_path)
+                print()
+                self.reporter.get_brute_force_results()
 
             elif choice == "8":
+                print()
+                self.reporter.get_most_targeted_user()
+
+            elif choice == "9":
+                print()
+                self.reporter.detect_suspicious_success()
+
+            elif choice == "10":
+                file_path = input("Enter log file path: ")
+                self.analyser.reset()
+                file_path = "log_files/" + file_path
+                self.analyser.analyse(file_path)
+
+            elif choice == "11":
                 print("Goodbye!")
                 self.running = False
 
