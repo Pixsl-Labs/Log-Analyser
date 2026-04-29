@@ -2,12 +2,28 @@ import re
 from datetime import datetime
 
 class LogAnalyser:
+    """
+    Analyses authentication log files to extract information about
+    failed and successful login attempts.
+
+    Tracks:
+    - Failed login attempts (IP, user, timestamp)
+    - Successful logins
+    - Failed login counts per IP
+    """
     def __init__(self):
         self.failed_logins = []
         self.successful_logins = []
         self.failed_ip_counts = {}
 
     def analyse(self, file_path):
+        """
+        Reads and processes a log file, extracting failed and successful
+        login attempts.
+
+        Returns:
+            bool: True if file was successfully processed, False otherwise.
+        """
         found_failed = False
         found_success = False
 
@@ -35,6 +51,10 @@ class LogAnalyser:
             return False
 
     def extract_failed_ip(self, line):
+        """
+        Extracts IP address, username, and timestamp from a failed login line
+        and stores the result.
+        """
         ip_match = re.search(r'\b\d{1,3}(?:\.\d{1,3}){3}\b', line)
         user_match = re.search(r'Failed password for (?:invalid user )?(\w+)', line)
 
@@ -54,6 +74,10 @@ class LogAnalyser:
             self.failed_ip_counts[ip] = self.failed_ip_counts.get(ip, 0) + 1
 
     def extract_successful_login(self, line):
+        """
+        Extracts IP address and username from a successful login line
+        and stores the result.
+        """
         line_lower = line.lower()
         ip_match = re.search(r'\b(?:from|for .*? from) ([\d\.]+)', line_lower)
         user_match = re.search(r'for (\w+)', line_lower)
@@ -64,12 +88,24 @@ class LogAnalyser:
         self.successful_logins.append((ip, user))
 
     def extract_time_stamps(self, line):
+        """
+        Extracts the timestamp from a log line.
+
+        Returns:
+            str or None: The timestamp string if found, otherwise None.
+        """
         match = re.search(r'^\w+\s+\d+\s+\d{4}\s+\d{2}:\d{2}:\d{2}', line)
         if match:
             return match.group()
         return None
 
     def group_attempts_by_ip(self):
+        """
+        Groups failed login timestamps by IP address.
+
+        Returns:
+            dict: {ip: [timestamps]}
+        """
         ip_attempts = {}
 
         for ip, user, time_stamp in self.failed_logins:
@@ -84,6 +120,9 @@ class LogAnalyser:
         return ip_attempts
 
     def reset(self):
+        """
+        Clears all stored login data to allow analysis of a new file.
+        """
         self.failed_logins = []
         self.successful_logins = []
         self.failed_ip_counts = {}
