@@ -4,6 +4,15 @@ Analyse log files in order to extract any unsuccessful login attempts or success
 
 The program can either be ran as normal by running the main.py Python file or can be ran by entering `python3 main.py <log_file_to_be_analysed>` -> (needs updating!).
 
+# Features
+
+- Detect failed login attempts
+- Identify suspicious IPs
+- Detect brute-force attacks (time-based)
+- Identify most targeted users
+- Detect successful logins after failures
+- Export analysis report to file
+
 # Building the Project
 
 1. **Clone the repository**
