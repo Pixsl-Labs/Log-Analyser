@@ -2,13 +2,24 @@ from app.log_analyser.log_analyser import LogAnalyser
 from app.log_analyser.log_reporter import LogReporter
 
 class Interaction:
+    """
+    Provides a command-line interface for interacting with the log analyser.
+
+    Handles:
+    - User input
+    - Menu display
+    - Triggering analysis and report functions
+    """
     def __init__(self, analyser, reporter):
         self.analyser: LogAnalyser = analyser
         self.reporter: LogReporter = reporter
         self.running = True
 
     def display_menu(self):
-        print("\n--- Log Analysis Menu ---")
+        """
+        Prints the display menu for Log Analysis 
+        """
+        print("\n--- Log Analysis Menu ---\n")
         print("1. Show full report")
         print("2. Show total failed logins")
         print("3. Show suspicious IPs")
@@ -23,6 +34,12 @@ class Interaction:
         print("12. Exit")
 
     def run(self):
+        """
+        Runs the main interaction loop for the application.
+
+        Displays the menu, processes user input, and executes the
+        corresponding actions until the user chooses to exit.
+        """
         while self.running:
             self.display_menu()
             choice = input("\nSelect an option (1-12): ").strip()
@@ -41,19 +58,19 @@ class Interaction:
                 total = self.reporter.get_total_failed_login_attempts()
                 print(f"Total number of failed logins: {total}")
 
-                self.reporter.get_suspicious_ips()
+                self.reporter.print_suspicious_ips()
 
                 print()
 
-                self.reporter.get_failed_logins()
+                self.reporter.print_failed_logins()
 
                 print()
 
-                self.reporter.get_brute_force_results()
+                self.reporter.print_brute_force_results()
 
                 print()
 
-                self.reporter.get_most_targeted_user()
+                self.reporter.print_most_targeted_user()
 
                 print()
 
@@ -61,10 +78,10 @@ class Interaction:
 
                 print("\n--- Standard Logins ---\n")
 
-                total_ = self.reporter.get_total_successful_login_attempts()
+                total_ = self.reporter.get_total_successful_logins()
                 print(f"Total number of successful logins: {total_}\n")
 
-                self.reporter.get_successful_logins()
+                self.reporter.print_successful_logins()
 
             elif choice == "2":
                 print()
@@ -73,15 +90,15 @@ class Interaction:
 
             elif choice == "3":
                 print()
-                self.reporter.get_suspicious_ips()
+                self.reporter.print_suspicious_ips()
 
             elif choice == "4":
                 print()
-                self.reporter.get_failed_logins()
+                self.reporter.print_failed_logins()
 
             elif choice == "5":
                 print()
-                self.reporter.get_successful_logins()
+                self.reporter.print_successful_logins()
 
             elif choice == "6":
                 print()
@@ -90,18 +107,18 @@ class Interaction:
 
             elif choice == "7":
                 print()
-                self.reporter.get_brute_force_results()
+                self.reporter.print_brute_force_results()
 
             elif choice == "8":
                 print()
-                self.reporter.get_most_targeted_user()
+                self.reporter.print_most_targeted_user()
 
             elif choice == "9":
                 print()
                 self.reporter.detect_suspicious_success()
 
             elif choice == "10":
-                file_path = input("Enter report file path:")
+                file_path = input("Enter report file path: ")
                 file_path = "reports/" + file_path
                 self.reporter.export_report(file_path)
 
