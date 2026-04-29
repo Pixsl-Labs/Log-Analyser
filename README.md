@@ -58,8 +58,9 @@ All of the below information can be found through the `Log Analysis Menu`, where
 7. Show brute force detection
 8. Show targeted users
 9. Show suspicious success
-10. Analyse new file
-11. Exit
+10. Export report to file
+11. Analyse new file
+12. Exit
 ```
 
 Analyse a `.log` file to find out the following information:
@@ -72,8 +73,9 @@ Analyse a `.log` file to find out the following information:
    7. List of potential brute-forcing, listing the IP address, number of attempts within a timeframe and showing the threshold set to class it as brute-forcing
    8. Lists the most targeted users in order, with the user and number of attempts
    9. Lists all of the IP addresses which have successfully logged in after failing multiple times
-   10. Allows the user to select a new `.log` file for analysis
-   11. Allows the user to exit by entering the number `8`
+   10. Allows the user to export the report to a `.txt` file with a custom filename
+   11. Allows the user to select a new `.log` file for analysis
+   12. Allows the user to exit by entering the number `8`
 
 # Goal
 

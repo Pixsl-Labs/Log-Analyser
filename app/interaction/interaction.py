@@ -28,15 +28,18 @@ class Interaction:
             choice = input("\nSelect an option (1-12): ").strip()
 
             if choice == "1":
-                print("\n--- Full Report ---\n")
+                print("\n--- Log Analysis Report ---\n")
+
+                if not self.analyser.failed_logins and not self.analyser.successful_logins:
+                    print("Log file contained no relevant login activity.\n")
+
+                print("--- Attention Needed! ---\n")
 
                 all_ips = self.reporter.get_total_number_of_unique_ip_addresses()
                 print(f"Number of unique IPs: {len(all_ips)}\n")
 
                 total = self.reporter.get_total_failed_login_attempts()
                 print(f"Total number of failed logins: {total}")
-
-                print()
 
                 self.reporter.get_suspicious_ips()
 
@@ -56,7 +59,7 @@ class Interaction:
 
                 self.reporter.detect_suspicious_success()
 
-                print()
+                print("\n--- Standard Logins ---\n")
 
                 total_ = self.reporter.get_total_successful_login_attempts()
                 print(f"Total number of successful logins: {total_}\n")

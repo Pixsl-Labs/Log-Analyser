@@ -11,17 +11,19 @@ class LogReporter:
 
     def get_suspicious_ips(self):
         if not self.analyser.failed_ip_counts:
+            print("No suspicious IPs found.")
             return
 
+        print("Suspicious IPs (failed attempts):")
         sorted_ips = sorted(self.analyser.failed_ip_counts.items(), key=lambda x: x[1], reverse=True)
 
-        print("Suspicious IPs (failed attempts):")
         for ip, count in sorted_ips:
             status = "Investigate" if count >= MAX_ATTEMPTS else "Low risk"
             print(f"   {ip} -> {count} attempts ({status})")
 
     def get_failed_logins(self):
         if not self.analyser.failed_logins:
+            print("No failed logins found.")
             return
 
         print("Failed logins:")
@@ -30,6 +32,7 @@ class LogReporter:
 
     def get_successful_logins(self):
         if not self.analyser.successful_logins:
+            print("No successful logins found.")
             return
 
         print("Successful logins:")
@@ -95,6 +98,10 @@ class LogReporter:
     def get_most_targeted_user(self):
         sorted_users = self.most_targeted_user()
 
+        if not sorted_users:
+            print("No targeted users found.")
+            return
+
         print("Most targeted users:")
         for user, count in sorted_users:
             print(f"   {user} -> {count} attempts")
@@ -102,22 +109,26 @@ class LogReporter:
     def detect_suspicious_success(self):
         failed_ips = set(ip for ip, _, _ in self.analyser.failed_logins)
 
-        print("IPs with success after failure")
+        found = False
+
         for ip, user in self.analyser.successful_logins:
             if ip in failed_ips:
+                if not found:
+                    print("IPs with success after failure:")
+                    found = True
                 print(f"   {ip} successfully logged in after failures")
 
-
-
+        if not found:
+            print("No suspicious success detected.")
 
     def export_report(self, filename):
         with open(filename, "w") as f:
-            f.write("---Log Analysis Report---\n\n")
+            f.write("--- Log Analysis Report ---\n\n")
 
             if not self.analyser.failed_logins and not self.analyser.successful_logins:
                 f.write("Log file contained no relevant login activity.\n\n")
             
-            f.write("---Needs Attention!---\n\n")
+            f.write("--- Attention Needed! ---\n\n")
 
             # Unique IPs
             all_ips = self.get_total_number_of_unique_ip_addresses()
@@ -170,19 +181,18 @@ class LogReporter:
             # Suspicious success
             failed_ips = set(ip for ip, _, _ in self.analyser.failed_logins)
             found = False
-            f.write("IPs with success after failure:\n")
-            
+
             for ip, user in self.analyser.successful_logins:
                 if ip in failed_ips:
                     if not found:
-                        f.write("IPs with success after failure:\n")
+                        f.write("\nIPs with success after failure:\n")
                         found = True
                     f.write(f"   {ip} successfully logged in after failures\n")
 
             if not found:
                 f.write("No suspicious success detected.\n")
 
-            f.write("\n---Standard Logins---\n\n")
+            f.write("\n--- Standard Logins ---\n\n")
 
             # Total Successful login attempts
             total_ = self.get_total_successful_login_attempts()
@@ -195,7 +205,3 @@ class LogReporter:
                     f.write(f"   User '{user}' logged in from {ip}\n")
             else:
                 f.write("\nNo successful logins found.\n")
-
-            
-            if not self.analyser.failed_logins and not self.analyser.successful_logins:
-                f.write("Log file contained no relevant login activity.\n\n")
