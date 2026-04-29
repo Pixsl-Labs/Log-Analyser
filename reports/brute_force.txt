@@ -1,0 +1,58 @@
+---Log Analysis Report---
+
+---Needs Attention!---
+
+Unique IPs: 4
+
+Suspicious IPs (failed attempts)
+   192.168.1.10 -> 6 attempts (Investigate)
+   172.16.0.2 -> 6 attempts (Investigate)
+   10.0.0.5 -> 5 attempts (Investigate)
+   192.168.1.20 -> 2 attempts (Low risk)
+
+Failed logins:
+   User 'admin' failed login from 192.168.1.10
+   User 'admin' failed login from 192.168.1.10
+   User 'admin' failed login from 192.168.1.10
+   User 'admin' failed login from 192.168.1.10
+   User 'admin' failed login from 192.168.1.10
+   User 'admin' failed login from 192.168.1.10
+   User 'user' failed login from 192.168.1.20
+   User 'user' failed login from 192.168.1.20
+   User 'guest' failed login from 10.0.0.5
+   User 'guest' failed login from 10.0.0.5
+   User 'guest' failed login from 10.0.0.5
+   User 'guest' failed login from 10.0.0.5
+   User 'guest' failed login from 10.0.0.5
+   User 'root' failed login from 172.16.0.2
+   User 'root' failed login from 172.16.0.2
+   User 'root' failed login from 172.16.0.2
+   User 'root' failed login from 172.16.0.2
+   User 'root' failed login from 172.16.0.2
+   User 'root' failed login from 172.16.0.2
+
+Brute force detected:
+   192.168.1.10 -> 5 attempts in 4s (threshold=5)
+   10.0.0.5 -> 5 attempts in 4s (threshold=5)
+   172.16.0.2 -> 5 attempts in 7s (threshold=5)
+
+Most targeted users:
+   admin -> 6 attempts
+   root -> 6 attempts
+   guest -> 5 attempts
+   user -> 2 attempts
+IPs with success after failure:
+   192.168.1.10 successfully logged in after failures
+   192.168.1.20 successfully logged in after failures
+   10.0.0.5 successfully logged in after failures
+   172.16.0.2 successfully logged in after failures
+
+---Standard Logins---
+
+Total number of successful logins: 4
+
+Successful logins:
+   User 'admin' logged in from 192.168.1.10
+   User 'test' logged in from 192.168.1.20
+   User 'guest' logged in from 10.0.0.5
+   User 'root' logged in from 172.16.0.2

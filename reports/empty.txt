@@ -1,0 +1,23 @@
+---Log Analysis Report---
+
+Log file contained no relevant login activity.
+
+---Needs Attention!---
+
+Unique IPs: 0
+
+No suspicious IPs found.
+No failed logins found.
+No brute force detected
+
+No targeted users found.
+IPs with success after failure:
+No suspicious success detected.
+
+---Standard Logins---
+
+Total number of successful logins: 0
+
+No successful logins found.
+Log file contained no relevant login activity.
+

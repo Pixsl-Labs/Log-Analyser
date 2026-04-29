@@ -1,6 +1,6 @@
 # Log Analyser
 
-Analyse log files in order to extract any unsuccessful login attempts or successful logins. Returning any detected failed attempts with the associated IP address and number of failed attempts by that IP address. As well as returning all successful login attempts linking it to which user was successfully logged in with adn the associated IP address.
+Analyse log files in order to extract any unsuccessful login attempts or successful logins. Returning any detected failed attempts with the associated IP address and number of failed attempts by that IP address. As well as returning all successful login attempts linking it to which user was successfully logged in with and the associated IP address.
 
 The program can either be ran as normal by running the main.py Python file or can be ran by entering `python3 main.py <log_file_to_be_analysed>` -> (needs updating!).
 
@@ -36,7 +36,7 @@ pip install -r requirements.txt
 4. **Run the application**
 
 ```
-python3 main.py <log_file_for_analysis>
+python3 app.main.py <log_file_for_analysis>
 ```
 
 Or can be ran using the `F5` key, running a json launch file.
@@ -55,8 +55,11 @@ All of the below information can be found through the `Log Analysis Menu`, where
 4. Show failed login details
 5. Show successful logins
 6. Show unique IP count
-7. Analyse new file
-8. Exit
+7. Show brute force detection
+8. Show targeted users
+9. Show suspicious success
+10. Analyse new file
+11. Exit
 ```
 
 Analyse a `.log` file to find out the following information:
@@ -66,8 +69,11 @@ Analyse a `.log` file to find out the following information:
    4. Lists out all of the failed login attempts, with information on which user and from which IP address
    5. Total number of successful login attempts
    6. List of successful logins, listing the user that was logged into and from which IP address
-   7. Allows the user to select a new `.log` file for analysis
-   8. Allows the user to exit by entering the number `8`
+   7. List of potential brute-forcing, listing the IP address, number of attempts within a timeframe and showing the threshold set to class it as brute-forcing
+   8. Lists the most targeted users in order, with the user and number of attempts
+   9. Lists all of the IP addresses which have successfully logged in after failing multiple times
+   10. Allows the user to select a new `.log` file for analysis
+   11. Allows the user to exit by entering the number `8`
 
 # Goal
 

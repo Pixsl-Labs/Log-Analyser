@@ -1,0 +1,19 @@
+---Log Analysis Report---
+
+---Needs Attention!---
+
+Unique IPs: 0
+
+No suspicious IPs found.
+Failed logins:
+
+No brute force detected
+
+Most targeted users:
+IPs with success after failure:
+
+---Standard Logins---
+
+Total number of successful logins: 0
+
+Successful logins:

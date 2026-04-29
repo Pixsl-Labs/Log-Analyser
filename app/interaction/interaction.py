@@ -18,19 +18,23 @@ class Interaction:
         print("7. Show brute force detection")
         print("8. Show targeted users")
         print("9. Show suspicious success")
-        print("10. Analyse new file")
-        print("11. Exit")
+        print("10. Export report to file")
+        print("11. Analyse new file")
+        print("12. Exit")
 
     def run(self):
         while self.running:
             self.display_menu()
-            choice = input("\nSelect an option (1-11): ").strip()
+            choice = input("\nSelect an option (1-12): ").strip()
 
             if choice == "1":
                 print("\n--- Full Report ---\n")
 
-                self.reporter.get_total_number_of_unique_ip_addresses()
-                self.reporter.get_total_failed_login_attempts()
+                all_ips = self.reporter.get_total_number_of_unique_ip_addresses()
+                print(f"Number of unique IPs: {len(all_ips)}\n")
+
+                total = self.reporter.get_total_failed_login_attempts()
+                print(f"Total number of failed logins: {total}")
 
                 print()
 
@@ -54,12 +58,15 @@ class Interaction:
 
                 print()
 
-                self.reporter.get_total_successful_login_attempts()
+                total_ = self.reporter.get_total_successful_login_attempts()
+                print(f"Total number of successful logins: {total_}\n")
+
                 self.reporter.get_successful_logins()
 
             elif choice == "2":
                 print()
-                self.reporter.get_total_failed_login_attempts()
+                total = self.reporter.get_total_failed_login_attempts()
+                print(f"Total number of failed logins: {total}")
 
             elif choice == "3":
                 print()
@@ -75,7 +82,8 @@ class Interaction:
 
             elif choice == "6":
                 print()
-                self.reporter.get_total_number_of_unique_ip_addresses()
+                all_ips = self.reporter.get_total_number_of_unique_ip_addresses()
+                print(f"Number of unique IPs: {len(all_ips)}\n")
 
             elif choice == "7":
                 print()
@@ -90,12 +98,17 @@ class Interaction:
                 self.reporter.detect_suspicious_success()
 
             elif choice == "10":
+                file_path = input("Enter report file path:")
+                file_path = "reports/" + file_path
+                self.reporter.export_report(file_path)
+
+            elif choice == "11":
                 file_path = input("Enter log file path: ")
                 self.analyser.reset()
                 file_path = "log_files/" + file_path
                 self.analyser.analyse(file_path)
 
-            elif choice == "11":
+            elif choice == "12":
                 print("Goodbye!")
                 self.running = False
 
