@@ -1,6 +1,8 @@
-import re
+import re, logging
 from datetime import datetime
 from dataclasses import dataclass
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 @dataclass
 class LogEntry:
@@ -45,7 +47,7 @@ class LogAnalyser:
                         found_success = True
                         self.extract_successful_login(line)
 
-            print(f"\nAnalysing file: {file_path}")
+            logging.info(f"Analysing file: {file_path}")
 
             if not found_failed:
                 print("No failed login attempts found.")
@@ -55,7 +57,7 @@ class LogAnalyser:
             return True
 
         except FileNotFoundError:
-            print(f"\nError: The file '{file_path}' was not found.")
+            logging.error(f"\nError: The file '{file_path}' was not found.")
             return False
 
     def extract_failed_ip(self, line: str) -> None:

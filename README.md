@@ -1,108 +1,82 @@
 # Log Analyser
 
-A command-line tool for analysing authentication log files to identify suspicious activity, including failed login attempts, brute-force attacks, and anomalous login behaviour.
+A Python-based command-line tool for analysing authentication log files and detecting suspicious activity such as brute-force attacks, repeated failed logins, and anomalous login behaviour.
 
-The application processes log files and provides both high-level summaries and detailed insights into login activity.
+The tool is designed with a modular architecture, separating log parsing, analysis, and interaction layers, and supports both interactive exploration and automated command-line usage.
 
-## Features
+## Usage Modes
 
-- Detect failed login attempts
-- Identify suspicious IP addresses based on failed login frequency
-- Detect brute-force attacks using time-based analysis
-- Identify the most targeted user accounts
-- Detect successful logins following multiple failed attempts
-- Display total and unique login statistics
-- Export analysis reports to a `.txt` file with a custom filename
-- Interactive command-line interface with selectable report options
+The application supports two modes of operation:
 
-## Getting Started
+### 1. Command-Line Mode (Recommended)
 
-### 1. Clone the repository
+Run a full report directly from the terminal:
 
 ```
-git clone https://github.com/Pixsl-Labs/Log-Analyser.git
-
-cd Log-Analyser
+python3 -m app.main <log_file> --report
 ```
 
-### 2. Create and activate a virtual environment
+This executes the analysis immediately without launching the interactive menu.
+
+---
+
+### 2. Interactive Mode
+
+Run without the `--report` flag to access the menu interface:
 
 ```
-python -m venv venv
+python3 -m app.main <log_file>
 ```
 
-Windows:
+This allows step-by-step exploration of the log data.
 
-```
-venv\Scripts\activate
-```
+## Architecture
 
-Linux / macOS:
+The project follows a modular design to separate concerns:
 
-```
-source venv/bin/activate
-```
+- **LogAnalyser**
+  - Responsible for parsing raw log files
+  - Converts log entries into structured `LogEntry` objects
 
-### 3. Install dependencies
+- **LogReporter**
+  - Performs analysis on parsed data
+  - Detects suspicious behaviour and generates reports
 
-```
-pip install -r requirements.txt
-```
+- **Interaction**
+  - Provides a command-line interface for user interaction
 
-### 4. Run the application
+- **LogEntry (dataclass)**
+  - Represents a structured log event (IP, user, timestamp, status)
 
-```
-python -m app.main <log_file>
-```
+This separation improves readability, maintainability, and extensibility of the system.
 
-Alternatively, the program can be run directly through an IDE using a configured run profile.
+## Detection Logic
 
-## Usage
+### Brute-Force Detection
 
-Upon running the application, the user is prompted to select options from an interactive menu:
+Brute-force attacks are detected using a time-based approach:
 
-```
---- Log Analysis Menu ---
+- Failed login attempts are grouped by IP address
+- Attempts are sorted by timestamp
+- A sliding window is applied to identify multiple attempts within a short time frame
+- If the number of attempts exceeds a configured threshold within the time window, the IP is flagged as suspicious
 
-1. Show full report
-2. Show total failed logins
-3. Show suspicious IPs
-4. Show failed login details
-5. Show successful logins
-6. Show unique IP count
-7. Show brute force detection
-8. Show targeted users
-9. Show suspicious success
-10. Export report to file
-11. Analyse new file
-12. Exit
-```
+### Suspicious Success Detection
 
-The tool provides the following insights:
+The tool identifies IP addresses that successfully authenticate after previous failed attempts, which may indicate compromised credentials.
 
-- Total number of unique IP addresses
-- Total number of failed login attempts
-- Suspicious IPs with associated attempt counts and risk levels
-- Detailed list of failed login attempts (user and IP)
-- Total number of successful logins
-- Detailed list of successful login events
-- Detection of brute-force attacks based on configurable thresholds
-- Identification of the most targeted user accounts
-- Detection of IPs that successfully authenticate after repeated failures
-- Ability to export a structured report to a text file
+## Limitations
 
-## Goal
-
-To analyse system authentication logs and detect potentially malicious behaviour, such as repeated failed login attempts and brute-force attacks, in a structured and accessible way.
+- Assumes standard Linux authentication log format (e.g. `/var/log/auth.log`)
+- Limited handling of malformed or incomplete log entries
+- Detection thresholds are static and may require tuning for different environments
+- Does not currently support real-time log monitoring
 
 ## Future Improvements
 
-- Extend detection capabilities towards a SOC-style monitoring tool
-- Add support for additional log formats
-- Export reports in structured formats (e.g. JSON)
-- Introduce configurable thresholds via external configuration
-- Improve visual formatting of reports
-
-## References
-
-https://www.codecademy.com/article/command-line-arguments-in-python
+- Add real-time log monitoring capabilities
+- Introduce structured output formats (JSON, CSV)
+- Implement configurable thresholds via external configuration files
+- Add unit testing for detection logic
+- Improve CLI with additional flags and filtering options
+- Integrate logging framework for better observability
