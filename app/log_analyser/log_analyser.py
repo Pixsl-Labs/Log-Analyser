@@ -57,7 +57,7 @@ class LogAnalyser:
             return True
 
         except FileNotFoundError:
-            logging.error(f"\nError: The file '{file_path}' was not found.")
+            logging.error(f"Error: The file '{file_path}' was not found.")
             return False
 
     def extract_failed_ip(self, line: str) -> None:
