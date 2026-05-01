@@ -1,5 +1,5 @@
 from app.log_analyser.log_analyser import LogAnalyser
-from app.config import MAX_ATTEMPTS
+from app.config import MAX_ATTEMPTS, TIME_WINDOW_SECONDS
 
 class LogReporter:
     """
@@ -13,17 +13,31 @@ class LogReporter:
     def __init__(self, analyser):
         self.analyser: LogAnalyser = analyser
 
-    def get_total_failed_login_attempts(self):
+    def get_total_failed_login_attempts(self) -> int:
         """
         Returns the total number of failed logins detected
-        """
-        total = sum(self.analyser.failed_ip_counts.values())
-        return total
 
-    def print_suspicious_ips(self):
+        Returns:
+            int: Total number of failed login attempts
+        """
+        return sum(self.analyser.failed_ip_counts.values())
+    
+    def get_risk_level(self, count: int) -> str:
+        """
+        Returns the risk level based on the number of attempts
+
+        Returns:
+            str: Risk level
+        """
+        return "Investigate" if count >= MAX_ATTEMPTS else "Low risk"
+
+    def print_suspicious_ips(self) -> None:
         """
         Prints suspicious IP addresses due to failed login attempts
         Showing the IP address, number of attempts and severity level
+
+        Returns:
+            None
         """
         if not self.analyser.failed_ip_counts:
             print("No suspicious IPs found.")
@@ -33,59 +47,75 @@ class LogReporter:
         sorted_ips = sorted(self.analyser.failed_ip_counts.items(), key=lambda x: x[1], reverse=True)
 
         for ip, count in sorted_ips:
-            status = "Investigate" if count >= MAX_ATTEMPTS else "Low risk"
+            status = self.get_risk_level(count)
             print(f"   {ip} -> {count} attempts ({status})")
 
-    def print_failed_logins(self):
+    def print_failed_logins(self) -> None:
         """
         Prints failed login attempts
+        
+        Returns:
+            None
         """
         if not self.analyser.failed_logins:
             print("No failed logins found.")
             return
 
         print("Failed logins:")
-        for ip, user, _ in self.analyser.failed_logins:
-            print(f"   User '{user}' failed login from {ip}")
+        for entry in self.analyser.failed_logins:
+            print(f"   User '{entry.user}' failed login from {entry.ip}")
 
-    def print_successful_logins(self):
+    def print_successful_logins(self) -> None:
         """
         Prints successful logins
+
+        Returns:
+            None
         """
         if not self.analyser.successful_logins:
             print("No successful logins found.")
             return
 
         print("Successful logins:")
-        for ip, user in self.analyser.successful_logins:
-            print(f"   User '{user}' logged in from {ip}")
+        for entry in self.analyser.successful_logins:
+            print(f"   User '{entry.user}' logged in from {entry.ip}")
 
-    def get_total_successful_logins(self):
+    def get_total_successful_logins(self) -> int:
         """
         Returns the total number of successful logins
-        """
-        total = len(self.analyser.successful_logins)
-        return total
 
-    def get_total_number_of_unique_ip_addresses(self):
+        Returns:
+            int: Total number of successful logins
+        """
+        return len(self.analyser.successful_logins)
+
+    def get_total_number_of_unique_ip_addresses(self) -> int:
         """
         Returns the total number of unique IP addresses detected
+
+        Returns:
+            int: Total number of unqiue IP addresses identified
         """
         all_ips = set()
 
-        for ip, _, _ in self.analyser.failed_logins:
-            all_ips.add(ip)
+        for entry in self.analyser.failed_logins:
+            all_ips.add(entry.ip)
 
-        for ip, _ in self.analyser.successful_logins:
-            all_ips.add(ip)
+        for entry in self.analyser.successful_logins:
+            all_ips.add(entry.ip)
 
-        return all_ips
+        return len(all_ips)
 
-    def detect_bruteforce(self, threshold=5, window_seconds=10):
+    def detect_bruteforce(self) -> list[tuple[str, int, float]]:
         """
         Detects brute force attacks based on failed login attempts
         within a specified time window
+
+        Returns:
+            list[tuple[str, int, float]]: List of (ip, attempts, time_window_seconds)
         """
+        threshold = MAX_ATTEMPTS
+        window_seconds = TIME_WINDOW_SECONDS
         ip_attempts = self.analyser.group_attempts_by_ip()
         results = []
 
@@ -96,7 +126,7 @@ class LogReporter:
                 start = time_stamps[i]
                 end = time_stamps[i + threshold - 1]
 
-                diff = (end - start).seconds
+                diff = (end - start).total_seconds()
 
                 if diff <= window_seconds:
                     results.append((ip, threshold, diff))
@@ -104,11 +134,15 @@ class LogReporter:
                 
         return results
     
-    def print_brute_force_results(self):
+    def print_brute_force_results(self) -> None:
         """
         Prints the IP addresses of brute force attempts
         with the number of attempts within a specified time window
+
+        Returns:
+            None
         """
+        threshold = MAX_ATTEMPTS
         results = self.detect_bruteforce()
 
         if not results:
@@ -120,25 +154,31 @@ class LogReporter:
         for ip, threshold, diff in results:
             print(f"   {ip} -> {threshold} attempts in {diff}s (threshold={threshold})")
 
-    def get_most_targeted_user(self):
+    def get_most_targeted_users(self) -> list[tuple[str, int]]:
         """
         Counts failed login attempts per user and returns a list
-        of users sorted by number of attempts (descending).
+        of users sorted by number of attempts (descending)
+
+        Returns:
+            list[tuple[str, int]]: List of (user, attempt_count)
         """
         user_counts = {}
 
-        for ip, user, _ in self.analyser.failed_logins:
-            user_counts[user] = user_counts.get(user, 0) + 1
+        for entry in self.analyser.failed_logins:
+            user_counts[entry.user] = user_counts.get(entry.user, 0) + 1
 
         sorted_users = sorted(user_counts.items(), key=lambda x: x[1], reverse=True)
 
         return sorted_users
 
-    def print_most_targeted_user(self):
+    def print_most_targeted_user(self) -> None:
         """
         Prints out the most targeted users
+
+        Returns:
+            None
         """
-        sorted_users = self.most_targeted_user()
+        sorted_users = self.get_most_targeted_users()
 
         if not sorted_users:
             print("No targeted users found.")
@@ -148,29 +188,36 @@ class LogReporter:
         for user, count in sorted_users:
             print(f"   {user} -> {count} attempts")
 
-    def detect_suspicious_success(self):
+    def detect_suspicious_success(self) -> None:
         """
         Detects any suspicious login which had previous failed login attempts
+
+        Returns:
+            None
         """
-        failed_ips = set(ip for ip, _, _ in self.analyser.failed_logins)
+        failed_ips = set(entry.ip for entry in self.analyser.failed_logins)
 
         found = False
 
-        for ip, user in self.analyser.successful_logins:
-            if ip in failed_ips:
+        for entry in self.analyser.successful_logins:
+            if entry.ip in failed_ips:
                 if not found:
                     print("IPs with success after failure:")
                     found = True
-                print(f"   {ip} successfully logged in after failures")
+                print(f"   {entry.ip} successfully logged in after failures")
 
         if not found:
             print("No suspicious success detected.")
 
-    def export_report(self, filename):
+    def export_report(self, filename: str) -> None:
         """
         Exports a full report based on the .log file provided with a custom
         filename (*.txt)
+
+        Returns:
+            None
         """
+        threshold = MAX_ATTEMPTS
         with open(filename, "w") as f:
             f.write("--- Log Analysis Report ---\n\n")
 
@@ -180,8 +227,8 @@ class LogReporter:
             f.write("--- Attention Needed! ---\n\n")
 
             # Unique IPs
-            all_ips = self.get_total_number_of_unique_ip_addresses()
-            f.write(f"Unique IPs: {len(all_ips)}\n\n")
+            total_ips = self.get_total_number_of_unique_ip_addresses()
+            f.write(f"Unique IPs: {total_ips}\n\n")
 
             # Suspicious IPs
             if self.analyser.failed_ip_counts:
@@ -189,7 +236,7 @@ class LogReporter:
                 f.write("Suspicious IPs (failed attempts)\n")
                 
                 for ip, count in sorted_ips:
-                    status = "Investigate" if count >= MAX_ATTEMPTS else "Low risk"
+                    status = self.get_risk_level(count)
                     f.write(f"   {ip} -> {count} attempts ({status})\n")
 
                 f.write("\n")
@@ -199,8 +246,8 @@ class LogReporter:
             # Failed Logins
             if self.analyser.failed_logins:
                 f.write("Failed logins:\n")
-                for ip, user, _ in self.analyser.failed_logins:
-                    f.write(f"   User '{user}' failed login from {ip}\n")
+                for entry in self.analyser.failed_logins:
+                    f.write(f"   User '{entry.user}' failed login from {entry.ip}\n")
 
                 f.write("\n")
             else:
@@ -217,7 +264,7 @@ class LogReporter:
                 f.write("No brute force detected\n")
 
             # Most Targeted users
-            sorted_users = self.most_targeted_user()
+            sorted_users = self.get_most_targeted_users()
 
             if sorted_users:
                 f.write("\nMost targeted users:\n")
@@ -228,15 +275,15 @@ class LogReporter:
                 f.write("\nNo targeted users found.\n")
 
             # Suspicious success
-            failed_ips = set(ip for ip, _, _ in self.analyser.failed_logins)
+            failed_ips = set(entry.ip for entry in self.analyser.failed_logins)
             found = False
 
-            for ip, user in self.analyser.successful_logins:
-                if ip in failed_ips:
+            for entry in self.analyser.successful_logins:
+                if entry.ip in failed_ips:
                     if not found:
                         f.write("\nIPs with success after failure:\n")
                         found = True
-                    f.write(f"   {ip} successfully logged in after failures\n")
+                    f.write(f"   {entry.ip} successfully logged in after failures\n")
 
             if not found:
                 f.write("No suspicious success detected.\n")
@@ -250,7 +297,7 @@ class LogReporter:
             # Successful logins
             if self.analyser.successful_logins:
                 f.write("\nSuccessful logins:\n")
-                for ip, user in self.analyser.successful_logins:
-                    f.write(f"   User '{user}' logged in from {ip}\n")
+                for entry in self.analyser.successful_logins:
+                    f.write(f"   User '{entry.user}' logged in from {entry.ip}\n")
             else:
                 f.write("\nNo successful logins found.\n")

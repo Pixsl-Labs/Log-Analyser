@@ -15,9 +15,12 @@ class Interaction:
         self.reporter: LogReporter = reporter
         self.running = True
 
-    def display_menu(self):
+    def display_menu(self) -> None:
         """
-        Prints the display menu for Log Analysis 
+        Prints the display menu for Log Analysis
+
+        Returns:
+            None
         """
         print("\n--- Log Analysis Menu ---\n")
         print("1. Show full report")
@@ -33,12 +36,15 @@ class Interaction:
         print("11. Analyse new file")
         print("12. Exit")
 
-    def run(self):
+    def run(self) -> None:
         """
         Runs the main interaction loop for the application.
 
         Displays the menu, processes user input, and executes the
         corresponding actions until the user chooses to exit.
+
+        Returns:
+            None
         """
         while self.running:
             self.display_menu()
@@ -52,8 +58,8 @@ class Interaction:
 
                 print("--- Attention Needed! ---\n")
 
-                all_ips = self.reporter.get_total_number_of_unique_ip_addresses()
-                print(f"Number of unique IPs: {len(all_ips)}\n")
+                total_ips = self.reporter.get_total_number_of_unique_ip_addresses()
+                print(f"Number of unique IPs: {total_ips}\n")
 
                 total = self.reporter.get_total_failed_login_attempts()
                 print(f"Total number of failed logins: {total}")
@@ -102,8 +108,8 @@ class Interaction:
 
             elif choice == "6":
                 print()
-                all_ips = self.reporter.get_total_number_of_unique_ip_addresses()
-                print(f"Number of unique IPs: {len(all_ips)}\n")
+                total_ips = self.reporter.get_total_number_of_unique_ip_addresses()
+                print(f"Number of unique IPs: {total_ips}\n")
 
             elif choice == "7":
                 print()
