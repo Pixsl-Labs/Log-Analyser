@@ -32,9 +32,10 @@ class Interaction:
         print("7. Show brute force detection")
         print("8. Show targeted users")
         print("9. Show suspicious success")
-        print("10. Export report to file")
-        print("11. Analyse new file")
-        print("12. Exit")
+        print("10. Show user-targeted attacks")
+        print("11. Export report to file")
+        print("12. Analyse new file")
+        print("13. Exit")
 
     def run(self) -> None:
         """
@@ -82,6 +83,10 @@ class Interaction:
 
                 self.reporter.detect_suspicious_success()
 
+                print()
+
+                self.reporter.print_user_targeting()
+
                 print("\n--- Standard Logins ---\n")
 
                 total_ = self.reporter.get_total_successful_logins()
@@ -124,17 +129,21 @@ class Interaction:
                 self.reporter.detect_suspicious_success()
 
             elif choice == "10":
+                print()
+                self.reporter.print_user_targeting()
+
+            elif choice == "11":
                 file_path = input("Enter report file path: ")
                 file_path = "reports/" + file_path
                 self.reporter.export_report(file_path)
 
-            elif choice == "11":
+            elif choice == "12":
                 file_path = input("Enter log file path: ")
                 self.analyser.reset()
                 file_path = "log_files/" + file_path
                 self.analyser.analyse(file_path)
 
-            elif choice == "12":
+            elif choice == "13":
                 print("Goodbye!")
                 self.running = False
 

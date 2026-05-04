@@ -1,6 +1,8 @@
 from app.log_analyser.log_analyser import LogAnalyser
 from app.config import MAX_ATTEMPTS, TIME_WINDOW_SECONDS
 
+from collections import defaultdict
+
 class LogReporter:
     """
     Generates reports and summaries based on analysed log data.
@@ -149,7 +151,7 @@ class LogReporter:
             print("No brute force activity detected")
             return
         
-        print("Brute force detected:\n")
+        print("Brute force detected:")
 
         for ip, threshold, diff in results:
             print(f"   {ip} -> {threshold} attempts in {diff}s (threshold={threshold})")
@@ -208,6 +210,43 @@ class LogReporter:
 
         if not found:
             print("No suspicious success detected.")
+
+    def detect_user_targeting(self, threshold=5):
+        """
+        Detects users being targeted by multiple IPs.
+
+        Returns:
+            List of tuples (user, unique_ips, total_attempts)
+        """
+        user_attempts = defaultdict(list)
+
+        for entry in self.analyser.failed_logins:
+            user_attempts[entry.user].append(entry.ip)
+
+        results = []
+
+        for user, ips in user_attempts.items():
+            unique_ips = set(ips)
+
+            if len(unique_ips) >= threshold:
+                results.append((user, len(unique_ips), len(ips)))
+
+        return results
+    
+    def print_user_targeting(self):
+        """
+        Prints results of users being targeted by multiple IPs.
+        """
+        results = self.detect_user_targeting()
+
+        if not results:
+            print("No user-targeted attacks detected.")
+            return
+        
+        print("User-targeted attacks detected:")
+
+        for user, unique_ips, total_attempts in results:
+            print(f"   {user} targeted by {unique_ips}, IPs ({total_attempts}) attempts")
 
     def export_report(self, filename: str) -> None:
         """
@@ -287,6 +326,13 @@ class LogReporter:
 
             if not found:
                 f.write("No suspicious success detected.\n")
+
+            # User-targeting by multiple IPs
+            targeted_users = self.detect_user_targeting()
+            f.write("User-targeted attacks detected:\n")
+
+            for user, unique_ips, total_attempts in targeted_users:
+                f.write(f"   {user} targeted by {unique_ips}, IPs ({total_attempts}) attempts")
 
             f.write("\n--- Standard Logins ---\n\n")
 

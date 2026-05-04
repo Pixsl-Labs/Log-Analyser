@@ -1,0 +1,21 @@
+# --- BRUTE FORCE (single IP) ---
+Jan 10 2024 12:00:01 Failed password for root from 192.168.1.1
+Jan 10 2024 12:00:02 Failed password for root from 192.168.1.1
+Jan 10 2024 12:00:03 Failed password for root from 192.168.1.1
+Jan 10 2024 12:00:04 Failed password for root from 192.168.1.1
+Jan 10 2024 12:00:05 Failed password for root from 192.168.1.1
+
+# --- DISTRIBUTED ATTACK (multiple IPs targeting one user) ---
+Jan 10 2024 12:01:01 Failed password for admin from 10.0.0.1
+Jan 10 2024 12:01:02 Failed password for admin from 10.0.0.2
+Jan 10 2024 12:01:03 Failed password for admin from 10.0.0.3
+Jan 10 2024 12:01:04 Failed password for admin from 10.0.0.4
+Jan 10 2024 12:01:05 Failed password for admin from 10.0.0.5
+
+# --- NORMAL SUCCESSFUL LOGIN ---
+Jan 10 2024 12:02:00 Accepted password for user1 from 172.16.0.1
+
+# --- SUSPICIOUS SUCCESS (after failures) ---
+Jan 10 2024 12:03:01 Failed password for testuser from 192.168.2.1
+Jan 10 2024 12:03:02 Failed password for testuser from 192.168.2.1
+Jan 10 2024 12:03:03 Accepted password for testuser from 192.168.2.1

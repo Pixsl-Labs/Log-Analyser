@@ -24,12 +24,14 @@ if __name__ == "__main__":
 
         if args.report:
             print("\n--- Log Analysis Report ---\n")
+            print("--- Attention Needed! --- \n")
 
             report_steps = [
                 reporter.print_suspicious_ips,
                 reporter.print_brute_force_results,
                 reporter.print_most_targeted_user,
-                reporter.detect_suspicious_success
+                reporter.detect_suspicious_success,
+                reporter.print_user_targeting
             ]
 
             for step in report_steps:
