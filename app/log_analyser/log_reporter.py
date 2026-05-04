@@ -1,6 +1,7 @@
 from app.log_analyser.log_analyser import LogAnalyser
 from app.config import MAX_ATTEMPTS, TIME_WINDOW_SECONDS
 
+import json
 from collections import defaultdict
 
 class LogReporter:
@@ -45,7 +46,7 @@ class LogReporter:
             print("No suspicious IPs found.")
             return
 
-        print("Suspicious IPs (failed attempts):")
+        print("\n=== Suspicious IPs (Failed Attempts) ===")
         sorted_ips = sorted(self.analyser.failed_ip_counts.items(), key=lambda x: x[1], reverse=True)
 
         for ip, count in sorted_ips:
@@ -63,7 +64,7 @@ class LogReporter:
             print("No failed logins found.")
             return
 
-        print("Failed logins:")
+        print("\n=== Failed Logins ===")
         for entry in self.analyser.failed_logins:
             print(f"   User '{entry.user}' failed login from {entry.ip}")
 
@@ -78,7 +79,7 @@ class LogReporter:
             print("No successful logins found.")
             return
 
-        print("Successful logins:")
+        print("\n=== Successful Logins ===")
         for entry in self.analyser.successful_logins:
             print(f"   User '{entry.user}' logged in from {entry.ip}")
 
@@ -151,7 +152,7 @@ class LogReporter:
             print("No brute force activity detected")
             return
         
-        print("Brute force detected:")
+        print("\n=== Brute Force Detected ===")
 
         for ip, threshold, diff in results:
             print(f"   {ip} -> {threshold} attempts in {diff}s (threshold={threshold})")
@@ -186,7 +187,7 @@ class LogReporter:
             print("No targeted users found.")
             return
 
-        print("Most targeted users:")
+        print("\n=== Most Targeted Users ===")
         for user, count in sorted_users:
             print(f"   {user} -> {count} attempts")
 
@@ -204,7 +205,7 @@ class LogReporter:
         for entry in self.analyser.successful_logins:
             if entry.ip in failed_ips:
                 if not found:
-                    print("IPs with success after failure:")
+                    print("\n=== IPs with Success After Failure ===")
                     found = True
                 print(f"   {entry.ip} successfully logged in after failures")
 
@@ -243,12 +244,43 @@ class LogReporter:
             print("No user-targeted attacks detected.")
             return
         
-        print("User-targeted attacks detected:")
+        print("\n=== User Targeted Attacks Detected ===")
 
         for user, unique_ips, total_attempts in results:
             print(f"   {user} targeted by {unique_ips}, IPs ({total_attempts}) attempts")
 
-    
+    def print_attack_summary(self) -> None:
+        """
+        Prints a high-level sumamry of detected threats.
+        """
+        print("\n--- Attack Summary ---\n")
+
+        # Total failed attempts
+        total_failed = self.get_total_failed_login_attempts()
+        print(f"Total failed attempts: {total_failed}")
+
+        # Top IP
+        if self.analyser.failed_logins:
+            top_ip = max(self.analyser.failed_ip_counts.items(), key=lambda x: x[1])
+            print(f"Top attacking IP: {top_ip[0]} ({top_ip[1]} attempts)")
+        else:
+            print("Top attacking IP: None")
+
+        # Top user
+        targeted = self.get_most_targeted_users()
+        if targeted:
+            print(f"Most targeted user: {targeted[0]}, {targeted[1]}")
+        else:
+            print("Most targeted user: None")
+
+        # Brute-force count
+        brute = self.detect_bruteforce()
+        print(f"Brute-force alerts: {len(brute)}")
+
+        # Distributed attack count
+        targeting = self.detect_user_targeting()
+        print(f"User-targeting alerts: {len(targeting)}")
+
     def export_report(self, filename: str) -> None:
         """
         Exports a full report based on the .log file provided with a custom
@@ -273,11 +305,11 @@ class LogReporter:
             # Suspicious IPs
             if self.analyser.failed_ip_counts:
                 sorted_ips = sorted(self.analyser.failed_ip_counts.items(), key=lambda x: x[1], reverse=True)
-                f.write("Suspicious IPs (failed attempts)\n")
+                f.write("=== Suspicious IPs (Failed Attempts) ===\n")
                 
                 for ip, count in sorted_ips:
                     status = self.get_risk_level(count)
-                    f.write(f"   {ip} -> {count} attempts ({status})\n")
+                    f.write(f"   {ip:<15} -> {count} attempts ({status})\n")
 
                 f.write("\n")
             else:
@@ -285,7 +317,7 @@ class LogReporter:
             
             # Failed Logins
             if self.analyser.failed_logins:
-                f.write("Failed logins:\n")
+                f.write("=== Failed Logins ===\n")
                 for entry in self.analyser.failed_logins:
                     f.write(f"   User '{entry.user}' failed login from {entry.ip}\n")
 
@@ -296,7 +328,7 @@ class LogReporter:
             # Brute-force results
             results = self.detect_bruteforce()
             if results:
-                f.write("Brute force detected:\n")
+                f.write("=== Brute Force Detection ===\n")
 
                 for ip, threshold, diff in results:
                     f.write(f"   {ip} -> {threshold} attempts in {diff}s (threshold={threshold})\n")
@@ -307,10 +339,10 @@ class LogReporter:
             sorted_users = self.get_most_targeted_users()
 
             if sorted_users:
-                f.write("\nMost targeted users:\n")
+                f.write("\n=== Most Targeted Users ===\n")
                 
                 for user, count in sorted_users:
-                    f.write(f"   {user} -> {count} attempts\n")
+                    f.write(f"   {user:<10} -> {count} attempts\n")
             else:
                 f.write("\nNo targeted users found.\n")
 
@@ -321,7 +353,7 @@ class LogReporter:
             for entry in self.analyser.successful_logins:
                 if entry.ip in failed_ips:
                     if not found:
-                        f.write("\nIPs with success after failure:\n")
+                        f.write("\n=== IPs with Success After Failure ===\n")
                         found = True
                     f.write(f"   {entry.ip} successfully logged in after failures\n")
 
@@ -330,10 +362,10 @@ class LogReporter:
 
             # User-targeting by multiple IPs
             targeted_users = self.detect_user_targeting()
-            f.write("\nUser-targeted attacks detected:\n")
+            f.write("\n=== User Targeted Attacks Detected ===\n")
 
             for user, unique_ips, total_attempts in targeted_users:
-                f.write(f"   {user} targeted by {unique_ips}, IPs ({total_attempts}) attempts")
+                f.write(f"   {user} targeted by {unique_ips} IPs ({total_attempts} attempts)")
 
             f.write("\n\n--- Standard Logins ---\n\n")
 
@@ -343,8 +375,36 @@ class LogReporter:
 
             # Successful logins
             if self.analyser.successful_logins:
-                f.write("\nSuccessful logins:\n")
+                f.write("\n=== Successful Logins ===\n")
                 for entry in self.analyser.successful_logins:
                     f.write(f"   User '{entry.user}' logged in from {entry.ip}\n")
             else:
                 f.write("\nNo successful logins found.\n")
+
+    def export_json(self, filename):
+        """
+        Exports analysis results in structured JSON format.
+        """
+        data = {
+            "summary": {
+                "total_failed": self.get_total_failed_login_attempts(),
+                "total_successful": self.get_total_successful_logins(),
+                "unique_ips": self.get_total_number_of_unique_ip_addresses()
+            },
+            "suspicious_ips": self.analyser.failed_ip_counts,
+            "brute_force": [
+                {"ip": ip, "attempts": attempts, "time_window": diff}
+                for ip, attempts, diff in self.detect_bruteforce()
+            ],
+            "most_targeted_users": [
+                {"user": user, "attempts": count}
+                for user, count in self.get_most_targeted_users()
+            ],
+            "user_targeting": [
+                {"user": user, "unique_ips": unique_ips, "attempts": total}
+                for user, unique_ips, total in self.detect_user_targeting()
+            ]
+        }
+
+        with open(filename, "w") as f:
+            json.dump(data, f, indent=4)

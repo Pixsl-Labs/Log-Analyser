@@ -1,0 +1,44 @@
+{
+    "summary": {
+        "total_failed": 12,
+        "total_successful": 2,
+        "unique_ips": 8
+    },
+    "suspicious_ips": {
+        "192.168.1.1": 5,
+        "10.0.0.1": 1,
+        "10.0.0.2": 1,
+        "10.0.0.3": 1,
+        "10.0.0.4": 1,
+        "10.0.0.5": 1,
+        "192.168.2.1": 2
+    },
+    "brute_force": [
+        {
+            "ip": "192.168.1.1",
+            "attempts": 5,
+            "time_window": 4.0
+        }
+    ],
+    "most_targeted_users": [
+        {
+            "user": "root",
+            "attempts": 5
+        },
+        {
+            "user": "admin",
+            "attempts": 5
+        },
+        {
+            "user": "testuser",
+            "attempts": 2
+        }
+    ],
+    "user_targeting": [
+        {
+            "user": "admin",
+            "unique_ips": 5,
+            "attempts": 5
+        }
+    ]
+}
