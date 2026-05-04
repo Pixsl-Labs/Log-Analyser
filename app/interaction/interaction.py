@@ -121,7 +121,7 @@ class Interaction:
                 file_path = input("Enter report file path (.txt/.json): ")
                 file_path = "reports/" + file_path
                 if file_path.endswith(".txt"):                 
-                    self.reporter.export_report(file_path)
+                    self.reporter.export_txt(file_path)
                 elif file_path.endswith(".json"):                 
                     self.reporter.export_json(file_path)
 

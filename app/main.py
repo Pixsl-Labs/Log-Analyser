@@ -10,16 +10,30 @@ from app.log_analyser.log_reporter import LogReporter
 
 def run_cli(args):
     analyser = LogAnalyser()
-    log_file = "log_files/" + args.file
+    log_file = os.path.join("log_files", args.file)
     
     success = analyser.analyse(log_file)
 
     if success:
         reporter = LogReporter(analyser)
 
+        os.makedirs("reports", exist_ok=True)
+
+        if args.txt:
+            output_path = reporter.export_txt(os.path.join("reports", args.txt))
+            reporter.export_txt(output_path)
+
+            print(f"\nFile exported to: {output_path}")
+
+        if args.json:
+            output_path = reporter.export_json(os.path.join("reports", args.json))
+            reporter.export_json(output_path)
+
+            print(f"\nFile exported to: {output_path}")
+
         if args.report:
             print("\n--- Log Analysis Report ---\n")
-            print("--- Attention Needed! --- \n")
+            print("!!! Attention Needed !!! \n")
 
             report_steps = [
                 reporter.print_suspicious_ips,
@@ -32,7 +46,7 @@ def run_cli(args):
             for step in report_steps:
                 step()
                 print()
-        else:
+        elif not args.json and not args.txt:
             interaction = Interaction(analyser, reporter)
             interaction.run()
     else:
@@ -80,6 +94,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Log Analysis Tool")
     parser.add_argument("file", nargs="?", help="Path to log file")
     parser.add_argument("--report", action="store_true", help="Show full report")
+    parser.add_argument("--txt", help="Export report to .txt file")
+    parser.add_argument("--json", help="Export report to JSON file")
 
     args = parser.parse_args()
 

@@ -1,0 +1,50 @@
+--- Log Analysis Report ---
+
+!!! Attention Needed !!!
+
+Unique IPs: 8
+
+=== Suspicious IPs (Failed Attempts) ===
+   192.168.1.1     -> 5 attempts (Investigate)
+   192.168.2.1     -> 2 attempts (Low risk)
+   10.0.0.1        -> 1 attempts (Low risk)
+   10.0.0.2        -> 1 attempts (Low risk)
+   10.0.0.3        -> 1 attempts (Low risk)
+   10.0.0.4        -> 1 attempts (Low risk)
+   10.0.0.5        -> 1 attempts (Low risk)
+
+=== Failed Logins ===
+   User 'root' failed login from 192.168.1.1
+   User 'root' failed login from 192.168.1.1
+   User 'root' failed login from 192.168.1.1
+   User 'root' failed login from 192.168.1.1
+   User 'root' failed login from 192.168.1.1
+   User 'admin' failed login from 10.0.0.1
+   User 'admin' failed login from 10.0.0.2
+   User 'admin' failed login from 10.0.0.3
+   User 'admin' failed login from 10.0.0.4
+   User 'admin' failed login from 10.0.0.5
+   User 'testuser' failed login from 192.168.2.1
+   User 'testuser' failed login from 192.168.2.1
+
+=== Brute Force Detection ===
+   192.168.1.1 -> 5 attempts in 4.0s (threshold=5)
+
+=== Most Targeted Users ===
+   root       -> 5 attempts
+   admin      -> 5 attempts
+   testuser   -> 2 attempts
+
+=== IPs with Success After Failure ===
+   192.168.2.1 successfully logged in after failures
+
+=== User Targeted Attacks Detected ===
+   admin targeted by 5 IPs (5 attempts)
+
+--- Standard Logins ---
+
+Total number of successful logins: 2
+
+=== Successful Logins ===
+   User 'user1' logged in from 172.16.0.1
+   User 'testuser' logged in from 192.168.2.1

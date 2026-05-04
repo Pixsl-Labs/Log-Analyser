@@ -281,7 +281,7 @@ class LogReporter:
         targeting = self.detect_user_targeting()
         print(f"User-targeting alerts: {len(targeting)}")
 
-    def export_report(self, filename: str) -> None:
+    def export_txt(self, filename: str) -> None:
         """
         Exports a full report based on the .log file provided with a custom
         filename (*.txt)
@@ -296,7 +296,7 @@ class LogReporter:
             if not self.analyser.failed_logins and not self.analyser.successful_logins:
                 f.write("Log file contained no relevant login activity.\n\n")
             
-            f.write("--- Attention Needed! ---\n\n")
+            f.write("!!! Attention Needed !!!\n\n")
 
             # Unique IPs
             total_ips = self.get_total_number_of_unique_ip_addresses()
@@ -381,19 +381,27 @@ class LogReporter:
             else:
                 f.write("\nNo successful logins found.\n")
 
-    def export_json(self, filename):
+    def export_json(self, filename: str) -> None:
         """
         Exports analysis results in structured JSON format.
         """
+
         data = {
             "summary": {
                 "total_failed": self.get_total_failed_login_attempts(),
                 "total_successful": self.get_total_successful_logins(),
                 "unique_ips": self.get_total_number_of_unique_ip_addresses()
             },
-            "suspicious_ips": self.analyser.failed_ip_counts,
+            "suspicious_ips": [
+                {"ip": ip, "attempts": count}
+                for ip, count in self.analyser.failed_ip_counts.items()
+            ],
             "brute_force": [
-                {"ip": ip, "attempts": attempts, "time_window": diff}
+                {
+                    "ip": ip,
+                    "attempts": attempts,
+                    "time_window_seconds": diff
+                }
                 for ip, attempts, diff in self.detect_bruteforce()
             ],
             "most_targeted_users": [
@@ -401,10 +409,21 @@ class LogReporter:
                 for user, count in self.get_most_targeted_users()
             ],
             "user_targeting": [
-                {"user": user, "unique_ips": unique_ips, "attempts": total}
+                {
+                    "user": user,
+                    "unique_ips": unique_ips,
+                    "total_attempts": total
+                }
                 for user, unique_ips, total in self.detect_user_targeting()
+            ],
+            "suspicious_success": [
+                entry.ip
+                for entry in self.analyser.successful_logins
+                if entry.ip in {e.ip for e in self.analyser.failed_logins}
             ]
         }
 
         with open(filename, "w") as f:
             json.dump(data, f, indent=4)
+
+        print(f"JSON report exported to {filename}")
