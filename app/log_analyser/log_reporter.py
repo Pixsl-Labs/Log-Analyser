@@ -248,6 +248,7 @@ class LogReporter:
         for user, unique_ips, total_attempts in results:
             print(f"   {user} targeted by {unique_ips}, IPs ({total_attempts}) attempts")
 
+    
     def export_report(self, filename: str) -> None:
         """
         Exports a full report based on the .log file provided with a custom
@@ -329,12 +330,12 @@ class LogReporter:
 
             # User-targeting by multiple IPs
             targeted_users = self.detect_user_targeting()
-            f.write("User-targeted attacks detected:\n")
+            f.write("\nUser-targeted attacks detected:\n")
 
             for user, unique_ips, total_attempts in targeted_users:
                 f.write(f"   {user} targeted by {unique_ips}, IPs ({total_attempts}) attempts")
 
-            f.write("\n--- Standard Logins ---\n\n")
+            f.write("\n\n--- Standard Logins ---\n\n")
 
             # Total Successful login attempts
             total_ = self.get_total_successful_logins()
