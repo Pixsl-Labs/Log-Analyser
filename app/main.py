@@ -1,7 +1,8 @@
-import sys, argparse, os
+import sys, argparse, os, logging
 
 # Allows running directly
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 from app.interaction.interaction import Interaction
 

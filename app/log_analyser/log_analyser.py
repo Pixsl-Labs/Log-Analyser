@@ -2,8 +2,6 @@ import re, logging
 from datetime import datetime
 from dataclasses import dataclass
 
-logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
-
 @dataclass
 class LogEntry:
     ip: str

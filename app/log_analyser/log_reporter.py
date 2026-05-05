@@ -109,7 +109,7 @@ class LogReporter:
 
         return len(all_ips)
 
-    def detect_bruteforce(self) -> list[tuple[str, int, float]]:
+    def detect_bruteforce(self, threshold, window_seconds) -> list[tuple[str, int, float]]:
         """
         Detects brute force attacks based on failed login attempts
         within a specified time window
@@ -117,8 +117,6 @@ class LogReporter:
         Returns:
             list[tuple[str, int, float]]: List of (ip, attempts, time_window_seconds)
         """
-        threshold = MAX_ATTEMPTS
-        window_seconds = TIME_WINDOW_SECONDS
         ip_attempts = self.analyser.group_attempts_by_ip()
         results = []
 
@@ -137,7 +135,7 @@ class LogReporter:
                 
         return results
     
-    def print_brute_force_results(self) -> None:
+    def print_brute_force_results(self, threshold, window_seconds) -> None:
         """
         Prints the IP addresses of brute force attempts
         with the number of attempts within a specified time window
@@ -145,8 +143,7 @@ class LogReporter:
         Returns:
             None
         """
-        threshold = MAX_ATTEMPTS
-        results = self.detect_bruteforce()
+        results = self.detect_bruteforce(threshold, window_seconds)
 
         if not results:
             print("No brute force activity detected")
@@ -154,8 +151,8 @@ class LogReporter:
         
         print("\n=== Brute Force Detected ===")
 
-        for ip, threshold, diff in results:
-            print(f"   {ip} -> {threshold} attempts in {diff}s (threshold={threshold})")
+        for ip, attempts, diff in results:
+            print(f"   {ip} -> {attempts} attempts in {diff}s (threshold={threshold})")
 
     def get_most_targeted_users(self) -> list[tuple[str, int]]:
         """
@@ -212,7 +209,7 @@ class LogReporter:
         if not found:
             print("No suspicious success detected.")
 
-    def detect_user_targeting(self, threshold=5):
+    def detect_user_targeting(self, threshold):
         """
         Detects users being targeted by multiple IPs.
 
@@ -234,11 +231,14 @@ class LogReporter:
 
         return results
     
-    def print_user_targeting(self):
+    def print_user_targeting(self, threshold) -> None:
         """
         Prints results of users being targeted by multiple IPs.
+
+        Returns:
+            None
         """
-        results = self.detect_user_targeting()
+        results = self.detect_user_targeting(threshold)
 
         if not results:
             print("No user-targeted attacks detected.")
@@ -247,13 +247,13 @@ class LogReporter:
         print("\n=== User Targeted Attacks Detected ===")
 
         for user, unique_ips, total_attempts in results:
-            print(f"   {user} targeted by {unique_ips}, IPs ({total_attempts}) attempts")
+            print(f"   {user} targeted by {unique_ips} IPs ({total_attempts}) attempts")
 
     def print_attack_summary(self) -> None:
         """
         Prints a high-level sumamry of detected threats.
         """
-        print("\n--- Attack Summary ---\n")
+        print("\n=== Attack Summary ===\n")
 
         # Total failed attempts
         total_failed = self.get_total_failed_login_attempts()
@@ -291,7 +291,7 @@ class LogReporter:
         """
         threshold = MAX_ATTEMPTS
         with open(filename, "w") as f:
-            f.write("--- Log Analysis Report ---\n\n")
+            f.write("=== Log Analysis Report ===\n\n")
 
             if not self.analyser.failed_logins and not self.analyser.successful_logins:
                 f.write("Log file contained no relevant login activity.\n\n")
@@ -367,7 +367,7 @@ class LogReporter:
             for user, unique_ips, total_attempts in targeted_users:
                 f.write(f"   {user} targeted by {unique_ips} IPs ({total_attempts} attempts)")
 
-            f.write("\n\n--- Standard Logins ---\n\n")
+            f.write("\n\n=== Standard Logins ===\n\n")
 
             # Total Successful login attempts
             total_ = self.get_total_successful_logins()
