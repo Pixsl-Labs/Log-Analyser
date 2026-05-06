@@ -1,5 +1,5 @@
 from app.log_analyser.log_analyser import LogAnalyser
-from app.config import MAX_ATTEMPTS, TIME_WINDOW_SECONDS
+from app.config import MAX_ATTEMPTS, TIME_WINDOW_SECONDS, SEVERITY_LEVEL 
 
 import json
 from collections import defaultdict
@@ -33,7 +33,26 @@ class LogReporter:
             str: Risk level
         """
         return "Investigate" if count >= MAX_ATTEMPTS else "Low risk"
+    
+    def get_severity_level(self, count: int) -> str:
+        """
+        Returns the severity level based on the number of attempts.
 
+        Args:
+            count (int): Number of detected attempts.
+        
+        Returns:
+            str: Severity level
+        """
+        if count >= SEVERITY_LEVEL["HIGH"]:
+            return "HIGH"
+        
+        elif count >= SEVERITY_LEVEL["MEDIUM"]:
+            return "MEDIUM"
+        
+        else:
+            return "LOW"
+        
     def print_suspicious_ips(self) -> None:
         """
         Prints suspicious IP addresses due to failed login attempts
@@ -109,7 +128,11 @@ class LogReporter:
 
         return len(all_ips)
 
-    def detect_bruteforce(self, threshold, window_seconds) -> list[tuple[str, int, float]]:
+    def detect_bruteforce(
+            self,
+            threshold=MAX_ATTEMPTS, 
+            window_seconds=TIME_WINDOW_SECONDS
+        ) -> list[tuple[str, int, float]]:
         """
         Detects brute force attacks based on failed login attempts
         within a specified time window
@@ -135,7 +158,11 @@ class LogReporter:
                 
         return results
     
-    def print_brute_force_results(self, threshold, window_seconds) -> None:
+    def print_brute_force_results(
+            self, 
+            threshold=MAX_ATTEMPTS,
+            window_seconds=TIME_WINDOW_SECONDS
+        ) -> None:
         """
         Prints the IP addresses of brute force attempts
         with the number of attempts within a specified time window
@@ -152,7 +179,8 @@ class LogReporter:
         print("\n=== Brute Force Detected ===")
 
         for ip, attempts, diff in results:
-            print(f"   {ip} -> {attempts} attempts in {diff}s (threshold={threshold})")
+            severity = self.get_severity_level(attempts)
+            print(f"   {ip} -> {attempts} attempts in {diff}s (threshold={threshold}) [{severity}]")
 
     def get_most_targeted_users(self) -> list[tuple[str, int]]:
         """
@@ -209,7 +237,7 @@ class LogReporter:
         if not found:
             print("No suspicious success detected.")
 
-    def detect_user_targeting(self, threshold):
+    def detect_user_targeting(self, threshold=MAX_ATTEMPTS):
         """
         Detects users being targeted by multiple IPs.
 
@@ -231,7 +259,10 @@ class LogReporter:
 
         return results
     
-    def print_user_targeting(self, threshold) -> None:
+    def print_user_targeting(
+            self, 
+            threshold=MAX_ATTEMPTS
+        ) -> None:
         """
         Prints results of users being targeted by multiple IPs.
 
@@ -247,7 +278,8 @@ class LogReporter:
         print("\n=== User Targeted Attacks Detected ===")
 
         for user, unique_ips, total_attempts in results:
-            print(f"   {user} targeted by {unique_ips} IPs ({total_attempts}) attempts")
+            severity = self.get_severity_level(unique_ips)
+            print(f"   {user} targeted by {unique_ips} IPs ({total_attempts}) attempts [{severity}]")
 
     def print_attack_summary(self) -> None:
         """
@@ -269,7 +301,8 @@ class LogReporter:
         # Top user
         targeted = self.get_most_targeted_users()
         if targeted:
-            print(f"Most targeted user: {targeted[0]}, {targeted[1]}")
+            top_user, attempts = targeted[0]
+            print(f"Most targeted user: {top_user} ({attempts} attempts)")
         else:
             print("Most targeted user: None")
 
@@ -278,7 +311,7 @@ class LogReporter:
         print(f"Brute-force alerts: {len(brute)}")
 
         # Distributed attack count
-        targeting = self.detect_user_targeting()
+        targeting = self.detect_user_targeting(MAX_ATTEMPTS)
         print(f"User-targeting alerts: {len(targeting)}")
 
     def export_txt(self, filename: str) -> None:
@@ -289,7 +322,6 @@ class LogReporter:
         Returns:
             None
         """
-        threshold = MAX_ATTEMPTS
         with open(filename, "w") as f:
             f.write("=== Log Analysis Report ===\n\n")
 
@@ -330,8 +362,9 @@ class LogReporter:
             if results:
                 f.write("=== Brute Force Detection ===\n")
 
-                for ip, threshold, diff in results:
-                    f.write(f"   {ip} -> {threshold} attempts in {diff}s (threshold={threshold})\n")
+                for ip, attempts, diff in results:
+                    severity = self.get_severity_level(attempts)
+                    f.write(f"   {ip} -> {attempts} attempts in {diff}s (threshold={MAX_ATTEMPTS}) [{severity}]\n")
             else:
                 f.write("No brute force detected\n")
 
@@ -365,7 +398,8 @@ class LogReporter:
             f.write("\n=== User Targeted Attacks Detected ===\n")
 
             for user, unique_ips, total_attempts in targeted_users:
-                f.write(f"   {user} targeted by {unique_ips} IPs ({total_attempts} attempts)")
+                severity = self.get_severity_level(unique_ips)
+                f.write(f"   {user} targeted by {unique_ips} IPs ({total_attempts} attempts) [{severity}]\n")
 
             f.write("\n\n=== Standard Logins ===\n\n")
 
@@ -400,7 +434,8 @@ class LogReporter:
                 {
                     "ip": ip,
                     "attempts": attempts,
-                    "time_window_seconds": diff
+                    "time_window_seconds": round(diff, 2),
+                    "severity": self.get_severity_level(attempts)
                 }
                 for ip, attempts, diff in self.detect_bruteforce()
             ],
@@ -412,7 +447,8 @@ class LogReporter:
                 {
                     "user": user,
                     "unique_ips": unique_ips,
-                    "total_attempts": total
+                    "total_attempts": total,
+                    "severity": self.get_severity_level(unique_ips)
                 }
                 for user, unique_ips, total in self.detect_user_targeting()
             ],

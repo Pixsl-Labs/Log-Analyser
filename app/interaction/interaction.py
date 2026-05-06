@@ -154,6 +154,7 @@ class Interaction:
             choice = input("\nSelect an option (1-16): ").strip()
 
             if choice == "1":
+                self.current_config()
                 print("\n=== Log Analysis Report ===\n")
 
                 if not self.analyser.failed_logins and not self.analyser.successful_logins:
