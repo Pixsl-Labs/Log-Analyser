@@ -3,6 +3,7 @@ from app.config import MAX_ATTEMPTS, TIME_WINDOW_SECONDS, SEVERITY_LEVEL
 
 import json
 from collections import defaultdict
+from datetime import datetime
 
 class LogReporter:
     """
@@ -24,6 +25,49 @@ class LogReporter:
             int: Total number of failed login attempts
         """
         return sum(self.analyser.failed_ip_counts.values())
+    
+    def get_failed_logins_by_user(self, username: str) -> list:
+        """
+        Returns all failed login attempts for a specific user.
+        
+        Args:
+            username (str): Username to filter by
+            
+        Returns:
+            list: Matching failed login entries
+        """
+
+        results = []
+
+        for entry in self.analyser.failed_logins:
+            if entry.user.lower() == username.lower():
+                results.append(entry)
+
+        return results
+    
+    def print_failed_logins_by_user(self, username: str) -> None:
+        """
+        Prints failed login attempts for a specific user.
+        
+        Args:
+            username (str): Username to filter by
+            
+        Returns:
+            None
+        """
+
+        results = self.get_failed_logins_by_user(username)
+
+        if not results:
+            print(f"No failed logins found for user '{username}'")
+            return
+        
+        print(f"\n=== Failed Logins for User: {username} ===")
+
+        print(f"\n   Total failed attempts: {len(results)}\n")
+
+        for entry in results:
+            print(f"   {entry.user} failed login from {entry.ip}")
     
     def get_risk_level(self, count: int) -> str:
         """
@@ -53,6 +97,64 @@ class LogReporter:
         else:
             return "LOW"
         
+    def get_total_suspicious_ips(self) -> int:
+        """
+        Returns the total number of suspicious IPs detected.
+        
+        Returns:
+            int: Total number of suspicious IPs
+        """
+        return len(self.analyser.failed_ip_counts)
+    
+    def get_activity_by_ip(self, ip: str) -> list:
+        """
+        Returns all login activity associated with a specific IP address.
+        
+        Args:
+            ip (str): IP address to investigate
+            
+        Returns:
+            list: Matching login entries
+        """
+
+        results = []
+
+        for entry in self.analyser.failed_logins:
+            if entry.ip == ip:
+                results.append(entry)
+
+        for entry in self.analyser.successful_logins:
+            if entry.ip == ip:
+                results.append(entry)
+
+        return results
+    
+    def print_activity_by_ip(self, ip: str) -> None:
+        """
+        Prints all login activity associated with a specific IP address.
+        
+        Returns:
+            None
+        """
+
+        results = self.get_activity_by_ip(ip)
+
+        if not results:
+            print(f"\nNo activity found for IP '{ip}'")
+            return
+        
+        print(f"\n=== Activity For IP: {ip} ===")
+        
+        print(f"\n   Total events: {len(results)}\n")
+
+        for entry in results:
+            status = "SUCCESS" if entry.success else "FAILED"
+
+            print(
+                f"   [{status}] User '{entry.user}' "
+                f"at {entry.timestamp}"
+            )
+
     def print_suspicious_ips(self) -> None:
         """
         Prints suspicious IP addresses due to failed login attempts
@@ -322,8 +424,11 @@ class LogReporter:
         Returns:
             None
         """
+        now = datetime.now()
         with open(filename, "w") as f:
             f.write("=== Log Analysis Report ===\n\n")
+            
+            f.write(now.strftime("Generated: %Y-%m-%d %H:%M:%S\n\n"))
 
             if not self.analyser.failed_logins and not self.analyser.successful_logins:
                 f.write("Log file contained no relevant login activity.\n\n")
@@ -419,13 +524,13 @@ class LogReporter:
         """
         Exports analysis results in structured JSON format.
         """
+        now = datetime.now()
 
         data = {
-            "summary": {
-                "total_failed": self.get_total_failed_login_attempts(),
-                "total_successful": self.get_total_successful_logins(),
-                "unique_ips": self.get_total_number_of_unique_ip_addresses()
-            },
+            "generated_at": now.strftime("%Y-%m-%d %H:%M:%S"),
+
+            "summary": self.get_attack_statistics(),
+
             "suspicious_ips": [
                 {"ip": ip, "attempts": count}
                 for ip, count in self.analyser.failed_ip_counts.items()
@@ -463,3 +568,80 @@ class LogReporter:
             json.dump(data, f, indent=4)
 
         print(f"JSON report exported to {filename}")
+
+    def get_attack_statistics(self) -> dict:
+        """
+        Returns a high-level summary of attack statistics.
+
+        Returns:
+            dict: Summary statistics for analysed log data
+        """
+
+        # Failed attempts
+        total_failed = self.get_total_failed_login_attempts()
+
+        # Successful logins
+        total_successful = self.get_total_successful_logins()
+
+        # Suspicious IPs
+        total_suspicious_ips = self.get_total_suspicious_ips()
+
+        # Brute-force attempts
+        total_brute_force = self.detect_bruteforce()
+
+        # Number of targeted user
+        total_targeted_users = self.get_most_targeted_users()
+
+        # Highest severity
+        highest_severity = "NONE"
+
+        if self.analyser.failed_ip_counts:
+            highest_attempts = max(self.analyser.failed_ip_counts.values())
+            highest_severity = self.get_severity_level(highest_attempts)
+
+        # Top attacker
+        if self.analyser.failed_ip_counts:
+            top_ip, attempts = max(
+                self.analyser.failed_ip_counts.items(),
+                key=lambda x: x[1]
+            )
+
+            top_attacker = f"{top_ip} ({attempts} attempts)"
+        
+        # Most targeted user
+        most_targeted_user = None
+
+        targeted_users = self.get_most_targeted_users()
+
+        if targeted_users:
+            top_user, attempts = targeted_users[0]
+            most_targeted_user = f"{top_user} ({attempts} attempts)"
+
+        return {
+            "failed_attempts": total_failed,
+            "successful_logins": total_successful,
+            "suspicious_ips": total_suspicious_ips,
+            "brute_force_alerts": total_brute_force,
+            "targeted_users": total_targeted_users,
+            "highest_severity": highest_severity,
+            "top_attacker": top_attacker,
+            "most_targeted_user": most_targeted_user
+        }
+
+    def print_attack_statistics(self):
+        """
+        Prints a high-level summary of detected attack statistics.
+        """
+
+        stats = self.get_attack_statistics()
+
+        print("\n=== Attack Statistics ===")
+
+        print(f"\nFailed attempts: {stats['failed_attempts']}")
+        print(f"\nSuccessful logins: {stats['successful_logins']}")
+        print(f"\nSuspicious IPs: {stats['suspicious_ips']}")
+        print(f"\nBrute-force alerts: {stats['brute_force_alerts']}")
+        print(f"\nTargeted users: {stats['targeted_users']}")
+        print(f"\nHighest severity: {stats['highest_severity']}")
+        print(f"\nTop attacker: {stats['top_attacker']}")
+        print(f"\nMost targeted user: {stats['most_targeted_user']}")

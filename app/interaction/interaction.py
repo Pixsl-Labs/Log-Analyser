@@ -57,20 +57,23 @@ class Interaction:
         print("\n=== Log Analysis Menu ===\n")
         print("1. Show full report")
         print("2. Show attack summary")
-        print("3. Show total failed logins")
-        print("4. Show suspicious IPs")
-        print("5. Show failed login details")
-        print("6. Show successful logins")
-        print("7. Show unique IP count")
-        print("8. Show brute force detection")
-        print("9. Show targeted users")
-        print("10. Show suspicious success")
-        print("11. Show user-targeted attacks")
-        print("12. Export report to file")
-        print("13. Analyse new file")        
-        print("14. Configure settings")
-        print("15. Show current configuration")
-        print("16. Exit")
+        print("3. Show attack statistics")
+        print("4. Show total failed logins")
+        print("5. Show suspicious IPs")
+        print("6. Search activity by IP")
+        print("7. Show failed login details")
+        print("8. Search failed logins by user")
+        print("9. Show successful logins")
+        print("10. Show unique IP count")
+        print("11. Show brute force detection")
+        print("12. Show targeted users")
+        print("13. Show suspicious success")
+        print("14. Show user-targeted attacks")
+        print("15. Export report to file")
+        print("16. Analyse new file")        
+        print("17. Configure settings")
+        print("18. Show current configuration")
+        print("19. Exit")
 
     def display_configuration_menu(self) -> None:
         """
@@ -191,23 +194,42 @@ class Interaction:
                 self.reporter.print_attack_summary()
 
             elif choice == "3":
+                self.reporter.print_attack_statistics()
+
+            elif choice == "4":
                 total = self.reporter.get_total_failed_login_attempts()
                 print(f"\nTotal number of failed logins: {total}")
 
-            elif choice == "4":
+            elif choice == "5":
                 self.reporter.print_suspicious_ips()
 
-            elif choice == "5":
-                self.reporter.print_failed_logins()
-
             elif choice == "6":
-                self.reporter.print_successful_logins()
+                ip = input("Enter IP address: ").strip()
+
+                if not ip:
+                    print("No IP entered.")
+                else:
+                    self.reporter.print_activity_by_ip(ip)
 
             elif choice == "7":
+                self.reporter.print_failed_logins()
+
+            elif choice == "8":
+                username = input("Enter username: ").strip()
+
+                if not username:
+                    print(f"No username entered.")
+                else:
+                    self.reporter.print_failed_logins_by_user(username)
+
+            elif choice == "9":
+                self.reporter.print_successful_logins()
+
+            elif choice == "10":
                 total_ips = self.reporter.get_total_number_of_unique_ip_addresses()
                 print(f"\nNumber of unique IPs: {total_ips}")
 
-            elif choice == "8":
+            elif choice == "11":
                 threshold = self.integer_validation(
                     f"\nEnter threshold (default = {self.threshold}): ",
                     self.threshold,
@@ -222,13 +244,13 @@ class Interaction:
 
                 self.reporter.print_brute_force_results(threshold, window_seconds)
 
-            elif choice == "9":
+            elif choice == "12":
                 self.reporter.print_most_targeted_user()
 
-            elif choice == "10":
+            elif choice == "13":
                 self.reporter.detect_suspicious_success()
 
-            elif choice == "11":
+            elif choice == "14":
                 threshold = self.integer_validation(
                     f"\nEnter threshold (default = {self.threshold}): ",
                     self.threshold,
@@ -237,7 +259,7 @@ class Interaction:
                 
                 self.reporter.print_user_targeting(threshold)
 
-            elif choice == "12":
+            elif choice == "15":
                 file_path = input("Enter report file path (.txt/.json): ")
                 file_path = os.path.join("reports", file_path)
                 if file_path.endswith(".txt"):                 
@@ -245,19 +267,19 @@ class Interaction:
                 elif file_path.endswith(".json"):                 
                     self.reporter.export_json(file_path)
 
-            elif choice == "13":
+            elif choice == "16":
                 file_path = input("Enter log file path: ")
                 self.analyser.reset()
                 file_path = "log_files/" + file_path
                 self.analyser.analyse(file_path)
 
-            elif choice == "14":
+            elif choice == "17":
                 self.configure()
 
-            elif choice == "15":
+            elif choice == "18":
                 self.current_config()
             
-            elif choice == "16":
+            elif choice == "19":
                 print("Goodbye!")
                 self.running = False          
 
