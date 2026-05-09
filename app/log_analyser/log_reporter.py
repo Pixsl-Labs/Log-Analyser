@@ -587,10 +587,10 @@ class LogReporter:
         total_suspicious_ips = self.get_total_suspicious_ips()
 
         # Brute-force attempts
-        total_brute_force = self.detect_bruteforce()
+        total_brute_force = len(self.detect_bruteforce())
 
         # Number of targeted user
-        total_targeted_users = self.get_most_targeted_users()
+        total_targeted_users = len(self.get_most_targeted_users())
 
         # Highest severity
         highest_severity = "NONE"
@@ -600,6 +600,7 @@ class LogReporter:
             highest_severity = self.get_severity_level(highest_attempts)
 
         # Top attacker
+        top_attacker = None
         if self.analyser.failed_ip_counts:
             top_ip, attempts = max(
                 self.analyser.failed_ip_counts.items(),
@@ -645,3 +646,13 @@ class LogReporter:
         print(f"\nHighest severity: {stats['highest_severity']}")
         print(f"\nTop attacker: {stats['top_attacker']}")
         print(f"\nMost targeted user: {stats['most_targeted_user']}")
+
+    def print_analysis_summary(self):
+        stats = self.get_attack_statistics()
+
+        print("\n=== Analysis Summary ===")
+
+        print(f"\nFailed attempts: {stats['failed_attempts']}")
+        print(f"Successful logins: {stats['successful_logins']}")
+        print(f"Suspicious IPs: {stats['suspicious_ips']}")
+        print(f"Brute-force alerts: {stats['brute_force_alerts']}")

@@ -1,7 +1,7 @@
-import sys, argparse, os, logging
+import argparse
+import os
+import logging
 
-# Allows running directly
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 from app.interaction.interaction import Interaction
@@ -18,16 +18,20 @@ def run_cli(args):
     if success:
         reporter = LogReporter(analyser)
 
+        reporter.print_analysis_summary()
+
         os.makedirs("reports", exist_ok=True)
 
         if args.txt:
-            output_path = reporter.export_txt(os.path.join("reports", args.txt))
+            output_path = os.path.join("reports", args.txt)
+
             reporter.export_txt(output_path)
 
             print(f"\nFile exported to: {output_path}")
 
         if args.json:
-            output_path = reporter.export_json(os.path.join("reports", args.json))
+            output_path = os.path.join("reports", args.json)
+
             reporter.export_json(output_path)
 
             print(f"\nFile exported to: {output_path}")
@@ -54,7 +58,7 @@ def run_cli(args):
         print("\nAnalysis stopped due to missing file.")
 
 def run_interactive():
-    print("Interaction mode\n")
+    print("\n=== Interaction Mode ===\n")
 
     analyser = LogAnalyser()
 
@@ -86,6 +90,9 @@ def run_interactive():
             print("Failed to analyse file. Try again.\n")
     
     reporter = LogReporter(analyser)
+
+    reporter.print_analysis_summary()
+
     interaction = Interaction(analyser, reporter)
 
     interaction.run()
@@ -100,7 +107,11 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    if args.file:
-        run_cli(args)
-    else:
-        run_interactive()
+    try:
+        if args.file:
+            run_cli(args)
+        else:
+            run_interactive()
+
+    except KeyboardInterrupt:
+        print("\n\nExiting...")

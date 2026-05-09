@@ -58,48 +58,70 @@ class LogAnalyser:
             logging.error(f"Error: The file '{file_path}' was not found.")
             return False
 
-    def extract_failed_ip(self, line: str) -> None:
+    def extract_failed_ip(self, line):
         """
         Extracts IP address, username, and timestamp from a failed login line
-        and stores the result
-
-        Returns:
-            str or None: Failed login attempts if found, otherwise None
+        and stores the result.
         """
         ip_match = re.search(r'\b\d{1,3}(?:\.\d{1,3}){3}\b', line)
         user_match = re.search(r'Failed password for (?:invalid user )?(\w+)', line)
 
-        ip = ip_match.group() if ip_match else "unknown"
+        if not ip_match:
+            print()
+            logging.warning(f"Skipping failed login line with missing IP: {line.strip()}\n")
+            return
+
+        ip = ip_match.group()
         user = user_match.group(1) if user_match else "unknown"
 
         timestamp = self.extract_time_stamps(line)
 
-        if timestamp:
+        if not timestamp:
+            logging.warning(f"Skipping failed login line with missing timestamp: {line.strip()}\n")
+            return
+
+        try:
             dt = datetime.strptime(timestamp, "%b %d %Y %H:%M:%S")
-        else:
-            dt = None
+        except ValueError:
+            logging.warning(f"Skipping failed login line with invalid timestamp: {line.strip()}\n")
+            return
 
-        self.failed_logins.append(LogEntry(ip=ip, user=user, timestamp=dt, status="FAILED"))
+        self.failed_logins.append(
+            LogEntry(ip=ip, user=user, timestamp=dt, status="FAILED")
+        )
 
-        if ip_match:
-            self.failed_ip_counts[ip] = self.failed_ip_counts.get(ip, 0) + 1
+        self.failed_ip_counts[ip] = self.failed_ip_counts.get(ip, 0) + 1
 
-    def extract_successful_login(self, line: str) -> None:
+    def extract_successful_login(self, line):
         """
         Extracts IP address and username from a successful login line
-        and stores the result
-
-        Returns:
-            str or None: Successful logins if found, otherwise None
+        and stores the result.
         """
         line_lower = line.lower()
-        ip_match = re.search(r'\b(?:from|for .*? from) ([\d\.]+)', line_lower)
+
+        ip_match = re.search(r'\b\d{1,3}(?:\.\d{1,3}){3}\b', line_lower)
         user_match = re.search(r'for (\w+)', line_lower)
 
-        ip = ip_match.group(1) if ip_match else "unknown"
+        if not ip_match:
+            logging.warning(f"Skipping successful login line with missing IP: {line.strip()}\n")
+            return
+
+        ip = ip_match.group()
         user = user_match.group(1) if user_match else "unknown"
 
-        self.successful_logins.append(LogEntry(ip=ip, user=user, timestamp=None, status="SUCCESS"))
+        timestamp = self.extract_time_stamps(line)
+
+        dt = None
+
+        if timestamp:
+            try:
+                dt = datetime.strptime(timestamp, "%b %d %Y %H:%M:%S")
+            except ValueError:
+                logging.warning(f"Successful login has invalid timestamp, storing without timestamp: {line.strip()}\n")
+
+        self.successful_logins.append(
+            LogEntry(ip=ip, user=user, timestamp=dt, status="SUCCESS")
+        )
 
     def extract_time_stamps(self, line: str) -> str | None:
         """
