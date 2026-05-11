@@ -8,6 +8,7 @@ venv/
 
 # VS Code
 .vscode/
+*.code-workspace
 
 # OS
 .DS_Store

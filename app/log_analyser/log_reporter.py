@@ -148,10 +148,8 @@ class LogReporter:
         print(f"\n   Total events: {len(results)}\n")
 
         for entry in results:
-            status = "SUCCESS" if entry.success else "FAILED"
-
             print(
-                f"   [{status}] User '{entry.user}' "
+                f"   [{entry.status}] User '{entry.user}' "
                 f"at {entry.timestamp}"
             )
 

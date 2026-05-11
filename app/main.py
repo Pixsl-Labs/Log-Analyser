@@ -1,3 +1,5 @@
+# source venv/bin/activate
+
 import argparse
 import os
 import logging
