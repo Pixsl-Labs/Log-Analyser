@@ -46,6 +46,68 @@ class Interaction:
             logging.error(f"Error: Invalid input, using default.")
             print(f"Using default {label} ({default})\n")
             return default
+        
+    def handle_filter_menu(
+            self,
+            title,
+            show_all_function,
+            ip_function,
+            user_function
+        ) -> None:
+        """
+        Handles reusable filtering menu for investigation features.
+        
+        Args:
+            title (str): Menu title.
+            show_all_function (callable): Function for showing all results.
+            ip_function (callable): Function for IP filtering.
+            user_function (callable): Function for username filtering.
+
+        Returns:
+            None
+        """
+        while True:
+            print(f"\nFilter {title} by:")
+            print("1. None")
+            print("2. IP")
+            print("3. User")
+            print("4. Back")
+
+            filter_choice = input("\nSelect filter (1-4): ").strip()
+
+            if filter_choice == "1":
+                show_all_function()
+                break
+
+            elif filter_choice == "2":
+                self.reporter.print_all_ips()
+
+                ip = input("\nEnter IP address: ").strip()
+
+                if not ip:
+                    print("\nNo IP entered.")
+                    continue
+
+                ip_function(ip)
+                break
+
+            elif filter_choice == "3":
+                self.reporter.print_all_usernames()
+
+                username = input("\nEnter username: ").strip()
+
+                if not username:
+                    print("\nNo username entered.")
+                    continue
+
+                user_function(username)
+                break
+
+            elif filter_choice == "4":
+                break
+
+            else:
+                print(f"\n'{filter_choice}' is an invalid choice. Please try again.")
 
     def display_log_analysis_menu(self) -> None:
         """
@@ -54,23 +116,37 @@ class Interaction:
         Returns:
             None
         """
+
         print("\n=== Log Analysis Menu ===\n")
+
         print("1. Show full report")
         print("2. Show attack summary")
         print("3. Show attack statistics")
-        print("4. Show total failed logins")
-        print("5. Show suspicious IPs")
-        print("6. Search activity by IP")
-        print("7. Show failed login details")
-        print("8. Search failed logins by user")
-        print("9. Show successful logins")
-        print("10. Show unique IP count")
-        print("11. Show brute force detection")
-        print("12. Show targeted users")
-        print("13. Show suspicious success")
-        print("14. Show user-targeted attacks")
+
+        print("\n=== Investigation ===\n")
+
+        print("4. Show activity timeline")
+        print("5. Show suspicious activity")
+        print("6. Show failed login details")
+
+        print("\n=== Detection ===\n")
+
+        print("7. Show suspicious IPs")
+        print("8. Show brute force detection")
+        print("9. Show targeted users")
+        print("10. Show suspicious success")
+        print("11. Show user-targeted attacks")
+
+        print("\n=== General Information ===\n")
+
+        print("12. Show successful logins")
+        print("13. Show total failed logins")
+        print("14. Show unique IP count")
+
+        print("\n=== Configuration ===\n")
+
         print("15. Export report to file")
-        print("16. Analyse new file")        
+        print("16. Analyse new file")
         print("17. Configure settings")
         print("18. Show current configuration")
         print("19. Exit")
@@ -154,7 +230,7 @@ class Interaction:
         """
         while self.running:
             self.display_log_analysis_menu()
-            choice = input("\nSelect an option (1-16): ").strip()
+            choice = input("\nSelect an option (1-19): ").strip()
 
             if choice == "1":
                 self.current_config()
@@ -163,7 +239,7 @@ class Interaction:
                 if not self.analyser.failed_logins and not self.analyser.successful_logins:
                     print("Log file contained no relevant login activity.\n")
 
-                print("!!! Attention Needed !!!\n")
+                print("=== Attention Needed ===\n")
 
                 total_ips = self.reporter.get_total_number_of_unique_ip_addresses()
                 print(f"Number of unique IPs: {total_ips}\n")
@@ -196,32 +272,41 @@ class Interaction:
             elif choice == "3":
                 self.reporter.print_attack_statistics()
 
+            # === Investigation ===
+
             elif choice == "4":
+                self.handle_filter_menu(
+                        "Timeline",
+                        self.reporter.print_activity_timeline,
+                        self.reporter.print_activity_timeline_by_ip,
+                        self.reporter.print_activity_timeline_by_user
+                    )
+
+            elif choice == "5":
                 total = self.reporter.get_total_failed_login_attempts()
                 print(f"\nTotal number of failed logins: {total}")
 
-            elif choice == "5":
-                self.reporter.print_suspicious_ips()
-
             elif choice == "6":
-                ip = input("Enter IP address: ").strip()
+                self.handle_filter_menu(
+                        "Failed Logins",
+                        self.reporter.print_suspicious_ips,
+                        self.reporter.print_suspicious_activity_by_ip,
+                        self.reporter.print_suspicious_activity_by_username
+                    )
 
-                if not ip:
-                    print("No IP entered.")
-                else:
-                    self.reporter.print_activity_by_ip(ip)
-
+            # === Detection ===
+            
             elif choice == "7":
-                self.reporter.print_failed_logins()
-
+                self.handle_filter_menu(
+                        "Suspicious Activity",
+                        self.reporter.print_suspicious_ips,
+                        self.reporter.print_suspicious_activity_by_ip,
+                        self.reporter.print_suspicious_activity_by_username
+                    )
+            
             elif choice == "8":
-                username = input("Enter username: ").strip()
-
-                if not username:
-                    print(f"No username entered.")
-                else:
-                    self.reporter.print_failed_logins_by_user(username)
-
+                self.reporter.print_brute_force_results()
+            
             elif choice == "9":
                 self.reporter.print_successful_logins()
 
@@ -244,6 +329,8 @@ class Interaction:
 
                 self.reporter.print_brute_force_results(threshold, window_seconds)
 
+            # === General Information ===
+
             elif choice == "12":
                 self.reporter.print_most_targeted_user()
 
@@ -258,6 +345,8 @@ class Interaction:
                 )
                 
                 self.reporter.print_user_targeting(threshold)
+
+            # === Configuration ===
 
             elif choice == "15":
                 file_path = input("Enter report file path (.txt/.json): ")
@@ -281,7 +370,7 @@ class Interaction:
             
             elif choice == "19":
                 print("Goodbye!")
-                self.running = False          
+                self.running = False           
 
             else:
                 print("\nInvalid choice. Please try again.")

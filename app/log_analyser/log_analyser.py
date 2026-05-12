@@ -7,7 +7,7 @@ class LogEntry:
     ip: str
     user: str
     timestamp: datetime
-    status: str
+    status: str 
 
 class LogAnalyser:
     """
@@ -47,10 +47,10 @@ class LogAnalyser:
 
             logging.info(f"Analysing file: {file_path}")
 
-            if not found_failed:
-                print("No failed login attempts found.")
+            if not found_failed: 
+                print("\nNo failed login attempts found.")
             if not found_success:
-                print("No successful logins found.")
+                print("\nNo successful logins found.")
 
             return True
 
