@@ -1,13 +1,7 @@
+from app.log_analyser.log_entry import LogEntry
+
 import re, logging
 from datetime import datetime
-from dataclasses import dataclass
-
-@dataclass
-class LogEntry:
-    ip: str
-    user: str
-    timestamp: datetime
-    status: str 
 
 class LogAnalyser:
     """
