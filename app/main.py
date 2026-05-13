@@ -46,7 +46,7 @@ def run_cli(args):
                 reporter.print_suspicious_ips,
                 reporter.print_brute_force_results,
                 reporter.print_most_targeted_user,
-                reporter.detect_suspicious_success,
+                reporter.print_suspicious_success,
                 reporter.print_user_targeting
             ]
 

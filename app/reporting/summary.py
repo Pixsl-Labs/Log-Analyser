@@ -32,11 +32,11 @@ class Summary:
         targeted = self.get_user_targeting()
 
         if targeted:
-            top_user, attempts = targeted[0]
+            top_user, unique_ips, attempts = targeted[0]
 
             print(
                 f"Most targeted user: "
-                f"{top_user} ({attempts} attempts)"
+                f"{top_user} ({attempts} attempts from {unique_ips} IPs)"
             )
 
         else:
