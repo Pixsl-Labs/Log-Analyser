@@ -7,7 +7,9 @@ class Investigation:
         self,
         ip: str | None=None,
         username: str | None=None,
-        severity: str | None=None
+        severity: str | None=None,
+        start_time: datetime | None=None,
+        end_time: datetime | None=None
     ) -> list[LogEntry]:
         """
         Returns filtered suspicious activity.
@@ -36,13 +38,29 @@ class Investigation:
                 if entry.severity == severity
             ]
 
+        if start_time:
+            results = [
+                entry for entry in results
+                if entry.timestamp
+                and entry.timestamp >= start_time
+            ]
+
+        if end_time:
+            results = [
+                entry for entry in results
+                if entry.timestamp
+                and entry.timestamp <= end_time
+            ]
+
         return results
     
     def print_suspicious_activity(
         self,
         ip: str | None=None,
         username: str | None=None,
-        severity: str | None=None
+        severity: str | None=None,
+        start_time: datetime | None=None,
+        end_time: datetime | None=None
     ) -> None:
         """
         Prints filtered suspicious activity.
@@ -51,7 +69,9 @@ class Investigation:
         results = self.get_suspicious_activity(
             ip=ip,
             username=username,
-            severity=severity
+            severity=severity,
+            start_time=start_time,
+            end_time=end_time
         )
 
         if not results:
@@ -70,44 +90,12 @@ class Investigation:
                 f"at {entry.timestamp}"
             )
 
-    def get_most_targeted_users(self) -> list[tuple[str, int]]:
-        """
-        Returns users sorted by failed login attempts.
-        """
-
-        user_counts = {}
-
-        for entry in self.analyser.failed_logins:
-            user_counts[entry.user] = (
-                user_counts.get(entry.user, 0) + 1
-            )
-
-        return sorted(
-            user_counts.items(),
-            key=lambda x: x[1],
-            reverse=True
-        )
-
-    def print_most_targeted_user(self) -> None:
-        """
-        Prints the most targeted users.
-        """
-
-        sorted_users = self.get_most_targeted_users()
-
-        if not sorted_users:
-            print("\nNo targeted users found.")
-            return
-
-        print("\n=== Most Targeted Users ===\n")
-
-        for user, count in sorted_users:
-            print(f"   {user} -> {count} attempts")
-
     def get_activity_timeline(
         self,
         ip: str | None=None,
-        username: str | None=None
+        username: str | None=None,
+        start_time: datetime | None=None,
+        end_time: datetime | None=None
         ) -> list[LogEntry]:
         """
         Returns filtered activity timeline.
@@ -130,6 +118,20 @@ class Investigation:
                 if entry.user.lower() == username.lower()
             ]
 
+        if start_time:
+            results = [
+                entry for entry in results
+                if entry.timestamp
+                and entry.timestamp >= start_time
+            ]
+
+        if end_time:
+            results = [
+                entry for entry in results
+                if entry.timestamp
+                and entry.timestamp <= end_time
+            ]
+
         return sorted(
             results,
             key=lambda entry: entry.timestamp or datetime.min
@@ -138,14 +140,18 @@ class Investigation:
     def print_activity_timeline(
         self,
         ip: str | None=None,
-        username: str | None=None
+        username: str | None=None,
+        start_time: datetime | None=None,
+        end_time: datetime | None=None
     ) -> None:
         """
         Prints filtered activity timeline.
         """
         results = self.get_activity_timeline(
             ip=ip,
-            username=username
+            username=username,
+            start_time=start_time,
+            end_time=end_time
         )
 
         if not results:
@@ -153,10 +159,11 @@ class Investigation:
             return
         
         print("\n=== Activity Timeline ===\n")
+        print(f"\n   Total events: {len(results)}\n")
 
         for entry in results:
             time_str = (
-                entry.timestamp.strftime("%H:%M:%S")
+                entry.timestamp.strftime("%Y-%m-%d %H:%M:%S")
                 if entry.timestamp
                 else "Unknown"
             )

@@ -1,12 +1,16 @@
 from app.log_analyser.log_entry import LogEntry
 
+from datetime import datetime
+
 class Statistics:
     def get_failed_logins(
         self,
         ip: str | None=None,
         username: str | None=None,
         severity: str | None=None,
-        status: str | None=None
+        status: str | None=None,
+        start_time: datetime | None=None,
+        end_time: datetime | None=None
     ) -> list[LogEntry]:
         """
         Returns filtered failed login attempts.
@@ -38,6 +42,20 @@ class Statistics:
                 if entry.status == status
             ]
 
+        if start_time:
+            results = [
+                entry for entry in results
+                if entry.timestamp
+                and entry.timestamp >= start_time
+            ]
+
+        if end_time:
+            results = [
+                entry for entry in results
+                if entry.timestamp
+                and entry.timestamp <= end_time
+            ]
+
         return results
     
     def print_failed_logins(
@@ -45,7 +63,9 @@ class Statistics:
         ip: str | None=None,
         username: str | None=None,
         severity: str | None=None,
-        status: str | None=None
+        status: str | None=None,
+        start_time: datetime | None=None,
+        end_time: datetime | None=None
     ) -> None:
         """
         Prints filtered failed logins.
@@ -55,7 +75,9 @@ class Statistics:
             ip=ip,
             username=username,
             severity=severity,
-            status=status
+            status=status,
+            start_time=start_time,
+            end_time=end_time
         )
 
         if not results:
@@ -76,47 +98,65 @@ class Statistics:
         ip: str | None=None,
         username: str | None=None,
         severity: str | None=None,
-        status: str | None=None
+        status: str | None=None,
+        start_time: datetime | None=None,
+        end_time: datetime | None=None
         ) -> list[LogEntry]:
-            """
-            Returns filtered successful logins.
-            """
+        """
+        Returns filtered successful logins.
+        """
 
-            results = self.analyser.successful_logins
+        results = self.analyser.successful_logins
 
-            if ip:
-                results = [
-                    entry for entry in results
-                    if entry.ip == ip
-                ]
+        if ip:
+            results = [
+                entry for entry in results
+                if entry.ip == ip
+            ]
 
-            if username:
-                results = [
-                    entry for entry in results
-                    if entry.user.lower() == username.lower()
-                ]
-            
-            if severity:
-                results = [
-                    entry for entry in results
-                    if entry.severity == severity
-                ]
+        if username:
+            results = [
+                entry for entry in results
+                if entry.user.lower() == username.lower()
+            ]
+        
+        if severity:
+            results = [
+                entry for entry in results
+                if entry.severity == severity
+            ]
 
-            if status:
-                results = [
-                    entry for entry in results
-                    if entry.status == status
-                ]
+        if status:
+            results = [
+                entry for entry in results
+                if entry.status == status
+            ]
+        
+        if start_time:
+            results = [
+                entry for entry in results
+                if entry.timestamp
+                and entry.timestamp >= start_time
+            ]
 
-            return results
+        if end_time:
+            results = [
+                entry for entry in results
+                if entry.timestamp
+                and entry.timestamp <= end_time
+            ]
+
+        return results
 
     def print_successful_logins(
         self,
         ip: str | None=None,
         username: str | None=None,
         severity: str | None=None,
-        status: str | None=None
-        ) -> None:
+        status: str | None=None,
+        start_time: datetime | None=None,
+        end_time: datetime | None=None
+    ) -> None:
         """
         Prints filtered successful logins.
         """
@@ -125,7 +165,9 @@ class Statistics:
             ip=ip,
             username=username,
             severity=severity,
-            status=status
+            status=status,
+            start_time=start_time,
+            end_time=end_time
         )
 
         if not results:
@@ -237,6 +279,40 @@ class Statistics:
             "top_attacker": top_attacker,
             "most_targeted_user": most_targeted_user
         }
+    
+    def get_most_targeted_users(self) -> list[tuple[str, int]]:
+        """
+        Returns users sorted by failed login attempts.
+        """
+
+        user_counts = {}
+
+        for entry in self.analyser.failed_logins:
+            user_counts[entry.user] = (
+                user_counts.get(entry.user, 0) + 1
+            )
+
+        return sorted(
+            user_counts.items(),
+            key=lambda x: x[1],
+            reverse=True
+        )
+
+    def print_most_targeted_user(self) -> None:
+        """
+        Prints the most targeted users.
+        """
+
+        sorted_users = self.get_most_targeted_users()
+
+        if not sorted_users:
+            print("\nNo targeted users found.")
+            return
+
+        print("\n=== Most Targeted Users ===\n")
+
+        for user, count in sorted_users:
+            print(f"   {user} -> {count} attempts")
 
     def print_attack_statistics(self) -> None:
         """
