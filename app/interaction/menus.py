@@ -22,7 +22,7 @@ def display_log_analysis_menu() -> None:
 
     print("7. Show suspicious IPs")
     print("8. Show brute force detection")
-    print("9. Show targeted users")
+    print("9. Show most targeted users")
     print("10. Show suspicious success")
     print("11. Show user-targeted attacks")
 

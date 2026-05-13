@@ -6,4 +6,5 @@ class LogEntry:
     ip: str
     user: str
     timestamp: datetime
-    status: str 
+    status: str
+    severity: str = "LOW"

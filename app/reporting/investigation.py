@@ -1,149 +1,77 @@
 from datetime import datetime
 
 from app.log_analyser.log_entry import LogEntry
+from app.log_analyser.log_analyser import LogAnalyser
 
 
 class Investigation:
-    def get_failed_logins_by_user(self, username: str) -> list:
-        """
-        Returns all failed login attempts for a specific user.
-        """
-
-        results = []
-
-        for entry in self.analyser.failed_logins:
-            if entry.user.lower() == username.lower():
-                results.append(entry)
-
-        return results
-
-    def get_failed_logins_by_ip(self, ip: str) -> list:
-        """
-        Returns all failed login attempts for a specific IP address.
-        """
-
-        results = []
-
-        for entry in self.analyser.failed_logins:
-            if entry.ip == ip:
-                results.append(entry)
-
-        return results
-
-    def print_failed_logins_by_ip(self, ip: str) -> None:
-        """
-        Prints failed login attempts for a specific IP address.
-        """
-
-        results = self.get_failed_logins_by_ip(ip)
-
-        if not results:
-            print(f"\nNo failed logins found for IP '{ip}'.")
-            return
-
-        print(f"\n=== Failed Logins for IP: {ip} ===")
-
-        print(f"\n   Total failed attempts: {len(results)}\n")
-
-        for entry in results:
-            print(f"   {entry.user} failed login from {entry.ip}")
-
-    def print_failed_logins_by_user(self, username: str) -> None:
-        """
-        Prints failed login attempts for a specific user.
-        """
-
-        results = self.get_failed_logins_by_user(username)
-
-        if not results:
-            print(f"\nNo failed logins found for user '{username}'.")
-            return
-
-        print(f"\n=== Failed Logins for User: {username} ===")
-
-        print(f"\n   Total failed attempts: {len(results)}\n")
-
-        for entry in results:
-            print(f"   {entry.user} failed login from {entry.ip}")
-
-    def get_activity_by_ip(self, ip: str) -> list:
-        """
-        Returns all login activity associated with a specific IP address.
-        """
-
-        results = []
-
-        for entry in self.analyser.failed_logins:
-            if entry.ip == ip:
-                results.append(entry)
-
-        for entry in self.analyser.successful_logins:
-            if entry.ip == ip:
-                results.append(entry)
-
-        return results
-
-    def get_activity_by_username(self, username: str) -> list:
-        """
-        Returns all login activity associated with a specific username.
-        """
-
-        results = []
-
-        for entry in self.analyser.failed_logins:
-            if entry.user.lower() == username.lower():
-                results.append(entry)
-
-        for entry in self.analyser.successful_logins:
-            if entry.user.lower() == username.lower():
-                results.append(entry)
-
-        return results
-
-    def print_suspicious_activity_by_ip(self, ip: str) -> None:
-        """
-        Prints all login activity associated with a specific IP address.
-        """
-
-        results = self.get_activity_by_ip(ip)
-
-        if not results:
-            print(f"\nNo activity found for IP '{ip}'")
-            return
-
-        print(f"\n=== Activity For IP: {ip} ===")
-
-        print(f"\n   Total events: {len(results)}\n")
-
-        for entry in results:
-            print(
-                f"   [{entry.status}] "
-                f"User '{entry.user}' "
-                f"at {entry.timestamp}"
-            )
-
-    def print_suspicious_activity_by_username(
+    def __init__(self, analyser: LogAnalyser):
+        self.analyser = analyser
+    
+    def get_suspicious_activity(
             self,
-            username: str
-        ) -> None:
+            ip=None,
+            username=None,
+            severity=None
+    ) -> list:
         """
-        Prints all login activity associated with a specific user.
+        Returns filtered suspicious activity.
         """
 
-        results = self.get_activity_by_username(username)
+        results = (
+            self.analyser.failed_logins
+            + self.analyser.successful_logins
+        )
+
+        if ip:
+            results = [
+                entry for entry in results
+                if entry.ip == ip
+            ]
+
+        if username:
+            results = [
+                entry for entry in results
+                if entry.user.lower() == username.lower()
+            ]
+        
+        if severity:
+            results = [
+                entry for entry in results
+                if entry.severity == severity
+            ]
+
+        return results
+    
+    def print_suspicious_activity(
+            self,
+            ip=None,
+            username=None,
+            severity=None
+    ) -> None:
+        """
+        Prints filtered suspicious activity.
+        """
+
+        results = self.get_suspicious_activity(
+            ip=ip,
+            username=username,
+            severity=severity
+        )
 
         if not results:
-            print(f"\nNo activity found for user '{username}'")
+            print("\nNo matching suspicious activity found.")
             return
-
-        print(f"\n=== Activity For User: {username} ===")
+        
+        print(f"\n=== Suspicious Activity ===\n")
 
         print(f"\n   Total events: {len(results)}\n")
 
         for entry in results:
             print(
                 f"   [{entry.status}] "
-                f"User '{entry.user}' "
+                f"{entry.user} "
+                f"from {entry.ip} "
                 f"at {entry.timestamp}"
             )
 
@@ -215,87 +143,57 @@ class Investigation:
         for user, count in sorted_users:
             print(f"   {user} -> {count} attempts")
 
-    def get_activity_timeline(self) -> list[LogEntry]:
+    def get_activity_timeline(
+            self,
+            ip=None,
+            username=None
+        ) -> list[LogEntry]:
         """
-        Returns all login activity sorted chronologically.
+        Returns filtered activity timeline.
         """
 
-        all_activity = (
+        results = (
             self.analyser.failed_logins
             + self.analyser.successful_logins
         )
 
+        if ip:
+            results = [
+                entry for entry in results
+                if entry.ip == ip
+            ]
+
+        if username:
+            results = [
+                entry for entry in results
+                if entry.user.lower() == username.lower()
+            ]
+
         return sorted(
-            all_activity,
+            results,
             key=lambda entry: entry.timestamp or datetime.min
         )
-
-    def print_activity_timeline(self) -> None:
+    
+    def print_activity_timeline(
+            self,
+            ip=None,
+            username=None
+    ) -> None:
         """
-        Prints a chronological activity timeline.
+        Prints filtered activity timeline.
         """
+        results = self.get_activity_timeline(
+            ip=ip,
+            username=username
+        )
 
-        timeline = self.get_activity_timeline()
-
-        if not timeline:
-            print("\nNo timeline recovered.")
+        if not results:
+            print("\nNo matching activity timeline found.")
             return
-
+        
         print("\n=== Activity Timeline ===\n")
 
-        for entry in timeline:
-            time_str = (
-                entry.timestamp.strftime("%H:%M:%S")
-                if entry.timestamp
-                else "Unknown"
-            )
-
-            print(
-                f"   [{entry.status}] "
-                f"{time_str} "
-                f"{entry.user} from {entry.ip}"
-            )
-
-    def get_activity_timeline_by_user(
-            self,
-            username: str
-        ) -> list[LogEntry]:
-        """
-        Returns user activity sorted chronologically.
-        """
-
-        timeline = self.get_activity_timeline()
-
-        return [
-            entry for entry in timeline
-            if entry.user.lower() == username.lower()
-        ]
-
-    def print_activity_timeline_by_user(
-            self,
-            username: str
-        ) -> None:
-        """
-        Prints activity timeline for a user.
-        """
-
-        timeline = self.get_activity_timeline_by_user(
-            username
-        )
-
-        if not timeline:
-            print(
-                f"\nNo timeline recovered "
-                f"for user '{username}'."
-            )
-            return
-
-        print(
-            f"\n=== Activity Timeline "
-            f"for User: {username} ===\n"
-        )
-
-        for entry in timeline:
+        for entry in results:
             time_str = (
                 entry.timestamp.strftime("%H:%M:%S")
                 if entry.timestamp
@@ -328,56 +226,6 @@ class Investigation:
 
         for user in sorted(unique_usernames):
             print(f"   {user}")
-
-    def get_activity_timeline_by_ip(
-            self,
-            ip: str
-        ) -> list[LogEntry]:
-        """
-        Returns IP activity sorted chronologically.
-        """
-
-        timeline = self.get_activity_timeline()
-
-        return [
-            entry for entry in timeline
-            if entry.ip == ip
-        ]
-
-    def print_activity_timeline_by_ip(
-            self,
-            ip: str
-        ) -> None:
-        """
-        Prints activity timeline for an IP.
-        """
-
-        timeline = self.get_activity_timeline_by_ip(ip)
-
-        if not timeline:
-            print(
-                f"\nNo timeline recovered "
-                f"for IP '{ip}'."
-            )
-            return
-
-        print(
-            f"\n=== Activity Timeline "
-            f"for IP: {ip} ===\n"
-        )
-
-        for entry in timeline:
-            time_str = (
-                entry.timestamp.strftime("%H:%M:%S")
-                if entry.timestamp
-                else "Unknown"
-            )
-
-            print(
-                f"   [{entry.status}] "
-                f"{time_str} "
-                f"{entry.user} from {entry.ip}"
-            )
 
     def print_all_ips(self) -> None:
         """

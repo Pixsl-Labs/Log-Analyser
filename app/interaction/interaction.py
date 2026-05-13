@@ -61,7 +61,7 @@ class Interaction:
 
                 self.reporter.print_most_targeted_user()
 
-                self.reporter.detect_suspicious_success()
+                self.reporter.print_suspicious_success()
 
                 self.reporter.print_user_targeting(self.threshold)
 
@@ -82,48 +82,40 @@ class Interaction:
 
             elif choice == "4":
                 handle_filter_menu(
-                        self.reporter,
-                        "Timeline",
-                        self.reporter.print_activity_timeline,
-                        self.reporter.print_activity_timeline_by_ip,
-                        self.reporter.print_activity_timeline_by_user
-                    )
+                    reporter=self.reporter,
+                    title="Timeline",
+                    show_function=self.reporter.print_activity_timeline,
+                    filters=["ip", "username"]
+                )
 
             elif choice == "5":
-                total = self.reporter.get_total_failed_login_attempts()
-                print(f"\nTotal number of failed logins: {total}")
+                handle_filter_menu(
+                    reporter=self.reporter,
+                    title="Suspicious Activity",
+                    show_function=self.reporter.print_suspicious_activity,
+                    filters=["ip", "username", "severity"]
+                )
 
             elif choice == "6":
                 handle_filter_menu(
-                        self.reporter,
-                        "Failed Logins",
-                        self.reporter.print_suspicious_ips,
-                        self.reporter.print_suspicious_activity_by_ip,
-                        self.reporter.print_suspicious_activity_by_username
-                    )
+                    reporter=self.reporter,
+                    title="Failed Logins",
+                    show_function=self.reporter.print_failed_logins,
+                    filters=["ip", "username", "severity", "status"]
+                )
 
             # === Detection ===
             
             elif choice == "7":
                 handle_filter_menu(
-                        self.reporter,
-                        "Suspicious Activity",
-                        self.reporter.print_suspicious_ips,
-                        self.reporter.print_suspicious_activity_by_ip,
-                        self.reporter.print_suspicious_activity_by_username
-                    )
-            
+                    reporter=self.reporter,
+                    title="Suspicious IPs",
+                    show_function=self.reporter.print_suspicious_ips,
+                    filters=["ip", "severity"]
+                )
+
             elif choice == "8":
-                self.reporter.print_brute_force_results()
-            
-            elif choice == "9":
-                self.reporter.print_successful_logins()
 
-            elif choice == "10":
-                total_ips = self.reporter.get_total_number_of_unique_ip_addresses()
-                print(f"\nNumber of unique IPs: {total_ips}")
-
-            elif choice == "11":
                 threshold = integer_validation(
                     f"\nEnter threshold (default = {self.threshold}): ",
                     self.threshold,
@@ -136,24 +128,43 @@ class Interaction:
                     label="time window"
                 )
 
-                self.reporter.print_brute_force_results(threshold, window_seconds)
+                self.reporter.print_brute_force_results(
+                    threshold,
+                    window_seconds
+                )
 
-            # === General Information ===
-
-            elif choice == "12":
+            elif choice == "9":
                 self.reporter.print_most_targeted_user()
 
-            elif choice == "13":
-                self.reporter.detect_suspicious_success()
+            elif choice == "10":
+                self.reporter.print_suspicious_success()
 
-            elif choice == "14":
+            elif choice == "11":
+
                 threshold = integer_validation(
                     f"\nEnter threshold (default = {self.threshold}): ",
                     self.threshold,
                     label="threshold"
                 )
-                
+
                 self.reporter.print_user_targeting(threshold)
+
+            # === General Information ===
+
+            elif choice == "12":
+                self.reporter.print_successful_logins()
+
+            elif choice == "13":
+
+                total = self.reporter.get_total_failed_login_attempts()
+
+                print(f"\nTotal failed logins: {total}")
+
+            elif choice == "14":
+
+                total_ips = self.reporter.get_total_number_of_unique_ip_addresses()
+
+                print(f"\nUnique IP count: {total_ips}")
 
             # === Configuration ===
 

@@ -5,9 +5,13 @@ from app.config import (
     TIME_WINDOW_SECONDS,
     SEVERITY_LEVEL
 )
+from app.log_analyser.log_analyser import LogAnalyser
 
 
 class Detection:
+    def __init__(self, analyser: LogAnalyser):
+        self.analyser = analyser
+
     def get_risk_level(self, count: int) -> str:
         """
         Returns the risk level based on the number of attempts
@@ -95,7 +99,7 @@ class Detection:
                 f"[{severity}]"
             )
 
-    def detect_suspicious_success(self) -> None:
+    def print_suspicious_success(self) -> None:
         """
         Detects successful logins following failed attempts.
         """
@@ -172,16 +176,16 @@ class Detection:
                 f"[{severity}]"
             )
 
-    def print_suspicious_ips(self) -> None:
+    def get_suspicious_ips(
+            self,
+            ip=None,
+            severity=None
+    ) -> list:
         """
-        Prints suspicious IP addresses.
+        Returns filtered suspicious IP addresses.
         """
 
-        if not self.analyser.failed_ip_counts:
-            print("\nNo suspicious IPs found.")
-            return
-
-        print("\n=== Suspicious IPs (Failed Attempts) ===\n")
+        results = []
 
         sorted_ips = sorted(
             self.analyser.failed_ip_counts.items(),
@@ -189,11 +193,53 @@ class Detection:
             reverse=True
         )
 
-        for ip, count in sorted_ips:
+        for current_ip, count in sorted_ips:
+
+            current_severity = self.get_severity_level(count)
+
+            if ip and current_ip != ip:
+                continue
+
+            if severity and current_severity != severity:
+                continue
+
+            results.append(
+                (
+                    current_ip,
+                    count,
+                    current_severity
+                )
+            )
+
+        return results
+    
+    def print_suspicious_ips(
+            self,
+            ip=None,
+            severity=None
+    ) -> None:
+        """
+        Prints filtered suspicious IP addresses.
+        """
+
+        results = self.get_suspicious_ips(
+            ip=ip,
+            severity=severity
+        )
+
+        if not results:
+            print("\nNo suspicious IPs found.")
+            return
+        
+        print("\n=== Suspicious IPs (Failed Attempts) ===\n")
+
+        for current_ip, count, current_severity in results:
+
             status = self.get_risk_level(count)
 
             print(
-                f"   {ip} -> "
+                f"   {current_ip} ->"
                 f"{count} attempts "
-                f"({status})"
+                f"({status}) "
+                f"[{current_severity}]"
             )

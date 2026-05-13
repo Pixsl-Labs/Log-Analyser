@@ -34,9 +34,8 @@ def integer_validation(
 def handle_filter_menu(
         reporter,
         title,
-        show_all_function,
-        ip_function,
-        user_function
+        show_function,
+        filters
     ) -> None:
     """
     Handles reusable filtering menu for investigation features.
@@ -51,19 +50,39 @@ def handle_filter_menu(
         None
     """
     while True:
-        print(f"\nFilter {title} by:")
-        print("1. None")
-        print("2. IP")
-        print("3. User")
-        print("4. Back")
 
-        filter_choice = input("\nSelect filter (1-4): ").strip()
+        print(f"\nFilter {title} by:\n")
 
-        if filter_choice == "1":
-            show_all_function()
+        options = {}
+        option_number = 1
+
+        # Show all
+        print(f"{option_number}. None")
+        options[str(option_number)] = "none"
+        option_number += 1
+
+        # Dynamic filters
+        for filter_name in filters:
+            display_name = filter_name.upper() if filter_name == "ip" else filter_name.title()
+
+            print(f"{option_number}. {display_name}")
+            options[str(option_number)] = filter_name
+            option_number += 1
+
+        # Back
+        print(f"{option_number}. Back")
+        options[str(option_number)] = "back"
+
+        choice = input("\nSelect option: ").strip()
+
+        selected_filter = options.get(choice)
+
+        if selected_filter == "none":
+            show_function()
             break
 
-        elif filter_choice == "2":
+        elif selected_filter == "ip":
+
             reporter.print_all_ips()
 
             ip = input("\nEnter IP address: ").strip()
@@ -72,10 +91,11 @@ def handle_filter_menu(
                 print("\nNo IP entered.")
                 continue
 
-            ip_function(ip)
+            show_function(ip=ip)
             break
 
-        elif filter_choice == "3":
+        elif selected_filter == "username":
+
             reporter.print_all_usernames()
 
             username = input("\nEnter username: ").strip()
@@ -84,11 +104,37 @@ def handle_filter_menu(
                 print("\nNo username entered.")
                 continue
 
-            user_function(username)
+            show_function(username=username)
             break
 
-        elif filter_choice == "4":
+        elif selected_filter == "severity":
+
+            severity = input(
+                "\nEnter severity (LOW/MEDIUM/HIGH): "
+            ).strip().upper()
+
+            if not severity:
+                print("\nNo severity entered.")
+                continue
+
+            show_function(severity=severity)
+            break
+
+        elif selected_filter == "status":
+
+            status = input(
+                "\nEnter status (SUCCESS/FAILED): "
+            ).strip().upper()
+
+            if not status:
+                print("\nNo status entered.")
+                continue
+
+            show_function(status=status)
+            break
+
+        elif selected_filter == "back":
             break
 
         else:
-            print(f"\n'{filter_choice}' is an invalid choice. Please try again.")
+            print(f"\n'{choice}' is an invalid choice.")

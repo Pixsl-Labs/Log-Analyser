@@ -1,7 +1,79 @@
-from app.config import MAX_ATTEMPTS
-
+from app.log_analyser.log_analyser import LogAnalyser
 
 class Statistics:
+    def __init__(self, analyser: LogAnalyser):
+        self.analyser = analyser
+
+    def get_failed_logins(
+        self,
+        ip=None,
+        username=None,
+        severity=None,
+        status=None
+    ) -> list:
+        """
+        Returns filtered failed login attempts.
+        """
+
+        results = self.analyser.failed_logins
+
+        if ip:
+            results = [
+                entry for entry in results
+                if entry.ip == ip
+            ]
+
+        if username:
+            results = [
+                entry for entry in results
+                if entry.user.lower() == username.lower()
+            ]
+        
+        if severity:
+            results = [
+                entry for entry in results
+                if entry.severity == severity
+            ]
+
+        if status:
+            results = [
+                entry for entry in results
+                if entry.status == status
+            ]
+
+        return results
+    
+    def print_failed_logins(
+        self,
+        ip=None,
+        username=None,
+        severity=None,
+        status=None
+    ) -> None:
+        """
+        Prints filtered failed logins.
+        """
+
+        results = self.get_failed_logins(
+            ip=ip,
+            username=username,
+            severity=severity,
+            status=status
+        )
+
+        if not results:
+            print("\nNo matching failed logins found.")
+            return
+        
+        print("\n=== Failed Login Results ===")
+        print(f"\n   Total results: {len(results)}\n")
+
+        for entry in results:
+            print(
+                f"   {entry.user} failed login "
+                f"from {entry.ip}"
+            )
+
     def get_total_failed_login_attempts(self) -> int:
         """
         Returns the total number of failed logins detected
