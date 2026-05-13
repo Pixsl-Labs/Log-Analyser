@@ -3,7 +3,7 @@ from app.log_analyser.log_reporter import LogReporter
 from app.config import MAX_ATTEMPTS, TIME_WINDOW_SECONDS
 
 from app.interaction.menus import display_log_analysis_menu, current_config
-from app.interaction.filters import integer_validation, handle_filter_menu
+from app.interaction.filters import integer_validation, handle_filter_menu, get_time_range
 from app.interaction.configuration import configure
 
 import os

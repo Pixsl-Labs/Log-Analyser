@@ -1,6 +1,6 @@
 from app.log_analyser.log_entry import LogEntry
 
-from datetime import datetime
+from datetime import time
 
 class Statistics:
     def get_failed_logins(
@@ -9,8 +9,8 @@ class Statistics:
         username: str | None=None,
         severity: str | None=None,
         status: str | None=None,
-        start_time: datetime | None=None,
-        end_time: datetime | None=None
+        start_time: time | None=None,
+        end_time: time | None=None
     ) -> list[LogEntry]:
         """
         Returns filtered failed login attempts.
@@ -46,14 +46,14 @@ class Statistics:
             results = [
                 entry for entry in results
                 if entry.timestamp
-                and entry.timestamp >= start_time
+                and entry.timestamp.time() >= start_time
             ]
 
         if end_time:
             results = [
                 entry for entry in results
                 if entry.timestamp
-                and entry.timestamp <= end_time
+                and entry.timestamp.time() <= end_time
             ]
 
         return results
@@ -64,8 +64,8 @@ class Statistics:
         username: str | None=None,
         severity: str | None=None,
         status: str | None=None,
-        start_time: datetime | None=None,
-        end_time: datetime | None=None
+        start_time: time | None=None,
+        end_time: time | None=None
     ) -> None:
         """
         Prints filtered failed logins.
@@ -99,8 +99,8 @@ class Statistics:
         username: str | None=None,
         severity: str | None=None,
         status: str | None=None,
-        start_time: datetime | None=None,
-        end_time: datetime | None=None
+        start_time: time | None=None,
+        end_time: time | None=None
         ) -> list[LogEntry]:
         """
         Returns filtered successful logins.
@@ -136,14 +136,14 @@ class Statistics:
             results = [
                 entry for entry in results
                 if entry.timestamp
-                and entry.timestamp >= start_time
+                and entry.timestamp.time() >= start_time
             ]
 
         if end_time:
             results = [
                 entry for entry in results
                 if entry.timestamp
-                and entry.timestamp <= end_time
+                and entry.timestamp.time() <= end_time
             ]
 
         return results
@@ -154,8 +154,8 @@ class Statistics:
         username: str | None=None,
         severity: str | None=None,
         status: str | None=None,
-        start_time: datetime | None=None,
-        end_time: datetime | None=None
+        start_time: time | None=None,
+        end_time: time | None=None
     ) -> None:
         """
         Prints filtered successful logins.

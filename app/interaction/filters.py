@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 def integer_validation(
         prompt, 
@@ -30,6 +31,43 @@ def integer_validation(
         logging.error(f"Error: Invalid input, using default.")
         print(f"Using default {label} ({default})\n")
         return default
+    
+def get_time_range():
+
+    use_time_filter = input(
+        "\nApply time range? (y/n): "
+    ).strip().lower()
+
+    if use_time_filter != "y":
+        return None, None
+    
+    start = input(
+        "Start time (HH:MM:SS) "
+    ).strip()
+
+    end = input(
+        "End time (HH:MM:SS) "
+    ).strip()
+
+    try:
+
+        start_time = (
+            datetime.strptime(start, "%H:%M:%S").time()
+            if start else None
+        )
+
+        end_time = (
+            datetime.strptime(end, "%H:%M:%S").time()
+            if end else None
+        )
+
+        return start_time, end_time
+    
+    except ValueError:
+
+        logging.error(f"Error: Invalid time format, using default.")
+
+        return None, None
     
 def handle_filter_menu(
         reporter,
@@ -78,7 +116,13 @@ def handle_filter_menu(
         selected_filter = options.get(choice)
 
         if selected_filter == "none":
-            show_function()
+            start_time, end_time = get_time_range()
+
+            show_function(
+                start_time=start_time,
+                end_time=end_time
+            )
+
             break
 
         elif selected_filter == "ip":
@@ -91,7 +135,14 @@ def handle_filter_menu(
                 print("\nNo IP entered.")
                 continue
 
-            show_function(ip=ip)
+            start_time, end_time = get_time_range()
+
+            show_function(
+                ip=ip,
+                start_time=start_time,
+                end_time=end_time
+            )
+
             break
 
         elif selected_filter == "username":
@@ -104,7 +155,14 @@ def handle_filter_menu(
                 print("\nNo username entered.")
                 continue
 
-            show_function(username=username)
+            start_time, end_time = get_time_range()
+
+            show_function(
+                username=username,
+                start_time=start_time,
+                end_time=end_time
+            )
+
             break
 
         elif selected_filter == "severity":
@@ -117,7 +175,14 @@ def handle_filter_menu(
                 print("\nNo severity entered.")
                 continue
 
-            show_function(severity=severity)
+            start_time, end_time = get_time_range()
+
+            show_function(
+                severity=severity,
+                start_time=start_time,
+                end_time=end_time
+            )
+
             break
 
         elif selected_filter == "status":
@@ -130,7 +195,14 @@ def handle_filter_menu(
                 print("\nNo status entered.")
                 continue
 
-            show_function(status=status)
+            start_time, end_time = get_time_range()
+
+            show_function(
+                status=status,
+                start_time=start_time,
+                end_time=end_time
+            )
+
             break
 
         elif selected_filter == "back":
