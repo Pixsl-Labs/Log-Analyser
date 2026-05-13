@@ -173,9 +173,9 @@ class Detection:
             )
 
     def get_suspicious_ips(
-            self,
-            ip=None,
-            severity=None
+        self,
+        ip: str | None=None,
+        severity: str | None=None,
     ) -> list:
         """
         Returns filtered suspicious IP addresses.
@@ -210,9 +210,9 @@ class Detection:
         return results
     
     def print_suspicious_ips(
-            self,
-            ip=None,
-            severity=None
+        self,
+        ip: str | None=None,
+        severity: str | None=None
     ) -> None:
         """
         Prints filtered suspicious IP addresses.

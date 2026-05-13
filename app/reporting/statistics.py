@@ -1,11 +1,13 @@
+from app.log_analyser.log_entry import LogEntry
+
 class Statistics:
     def get_failed_logins(
         self,
-        ip=None,
-        username=None,
-        severity=None,
-        status=None
-    ) -> list:
+        ip: str | None=None,
+        username: str | None=None,
+        severity: str | None=None,
+        status: str | None=None
+    ) -> list[LogEntry]:
         """
         Returns filtered failed login attempts.
         """
@@ -40,10 +42,10 @@ class Statistics:
     
     def print_failed_logins(
         self,
-        ip=None,
-        username=None,
-        severity=None,
-        status=None
+        ip: str | None=None,
+        username: str | None=None,
+        severity: str | None=None,
+        status: str | None=None
     ) -> None:
         """
         Prints filtered failed logins.
@@ -70,12 +72,12 @@ class Statistics:
             )
 
     def get_successful_logins(
-            self,
-            ip=None,
-            username=None,
-            severity=None,
-            status=None
-        ) -> list:
+        self,
+        ip: str | None=None,
+        username: str | None=None,
+        severity: str | None=None,
+        status: str | None=None
+        ) -> list[LogEntry]:
             """
             Returns filtered successful logins.
             """
@@ -109,11 +111,11 @@ class Statistics:
             return results
 
     def print_successful_logins(
-            self,
-            ip=None,
-            username=None,
-            severity=None,
-            status=None
+        self,
+        ip: str | None=None,
+        username: str | None=None,
+        severity: str | None=None,
+        status: str | None=None
         ) -> None:
         """
         Prints filtered successful logins.

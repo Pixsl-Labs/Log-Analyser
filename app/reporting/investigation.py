@@ -4,11 +4,11 @@ from app.log_analyser.log_entry import LogEntry
 
 class Investigation:    
     def get_suspicious_activity(
-            self,
-            ip=None,
-            username=None,
-            severity=None
-    ) -> list:
+        self,
+        ip: str | None=None,
+        username: str | None=None,
+        severity: str | None=None
+    ) -> list[LogEntry]:
         """
         Returns filtered suspicious activity.
         """
@@ -39,10 +39,10 @@ class Investigation:
         return results
     
     def print_suspicious_activity(
-            self,
-            ip=None,
-            username=None,
-            severity=None
+        self,
+        ip: str | None=None,
+        username: str | None=None,
+        severity: str | None=None
     ) -> None:
         """
         Prints filtered suspicious activity.
@@ -105,9 +105,9 @@ class Investigation:
             print(f"   {user} -> {count} attempts")
 
     def get_activity_timeline(
-            self,
-            ip=None,
-            username=None
+        self,
+        ip: str | None=None,
+        username: str | None=None
         ) -> list[LogEntry]:
         """
         Returns filtered activity timeline.
@@ -136,9 +136,9 @@ class Investigation:
         )
     
     def print_activity_timeline(
-            self,
-            ip=None,
-            username=None
+        self,
+        ip: str | None=None,
+        username: str | None=None
     ) -> None:
         """
         Prints filtered activity timeline.
