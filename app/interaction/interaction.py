@@ -152,7 +152,12 @@ class Interaction:
             # === General Information ===
 
             elif choice == "12":
-                self.reporter.print_successful_logins()
+                handle_filter_menu(
+                    reporter=self.reporter,
+                    title="Successful Logins",
+                    show_function=self.reporter.print_successful_logins,
+                    filters=["ip", "username", "severity", "status"]
+                )
 
             elif choice == "13":
 

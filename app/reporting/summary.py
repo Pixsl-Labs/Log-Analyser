@@ -29,7 +29,7 @@ class Summary:
         else:
             print("Top attacking IP: None")
 
-        targeted = self.get_most_targeted_users()
+        targeted = self.get_user_targeting()
 
         if targeted:
             top_user, attempts = targeted[0]
@@ -42,11 +42,11 @@ class Summary:
         else:
             print("Most targeted user: None")
 
-        brute = self.detect_bruteforce()
+        brute = self.get_bruteforce()
 
         print(f"Brute-force alerts: {len(brute)}")
 
-        targeting = self.detect_user_targeting(
+        targeting = self.get_user_targeting(
             MAX_ATTEMPTS
         )
 

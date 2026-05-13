@@ -1,13 +1,8 @@
 from datetime import datetime
 
 from app.log_analyser.log_entry import LogEntry
-from app.log_analyser.log_analyser import LogAnalyser
 
-
-class Investigation:
-    def __init__(self, analyser: LogAnalyser):
-        self.analyser = analyser
-    
+class Investigation:    
     def get_suspicious_activity(
             self,
             ip=None,
@@ -73,40 +68,6 @@ class Investigation:
                 f"{entry.user} "
                 f"from {entry.ip} "
                 f"at {entry.timestamp}"
-            )
-
-    def print_failed_logins(self) -> None:
-        """
-        Prints failed login attempts.
-        """
-
-        if not self.analyser.failed_logins:
-            print("\nNo failed logins found.")
-            return
-
-        print("\n=== Failed Logins ===\n")
-
-        for entry in self.analyser.failed_logins:
-            print(
-                f"   User '{entry.user}' "
-                f"failed login from {entry.ip}"
-            )
-
-    def print_successful_logins(self) -> None:
-        """
-        Prints successful logins.
-        """
-
-        if not self.analyser.successful_logins:
-            print("\nNo successful logins found.")
-            return
-
-        print("\n=== Successful Logins ===\n")
-
-        for entry in self.analyser.successful_logins:
-            print(
-                f"   User '{entry.user}' "
-                f"logged in from {entry.ip}"
             )
 
     def get_most_targeted_users(self) -> list[tuple[str, int]]:

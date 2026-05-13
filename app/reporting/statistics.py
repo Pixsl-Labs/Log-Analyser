@@ -1,9 +1,4 @@
-from app.log_analyser.log_analyser import LogAnalyser
-
 class Statistics:
-    def __init__(self, analyser: LogAnalyser):
-        self.analyser = analyser
-
     def get_failed_logins(
         self,
         ip=None,
@@ -74,6 +69,76 @@ class Statistics:
                 f"from {entry.ip}"
             )
 
+    def get_successful_logins(
+            self,
+            ip=None,
+            username=None,
+            severity=None,
+            status=None
+        ) -> list:
+            """
+            Returns filtered successful logins.
+            """
+
+            results = self.analyser.successful_logins
+
+            if ip:
+                results = [
+                    entry for entry in results
+                    if entry.ip == ip
+                ]
+
+            if username:
+                results = [
+                    entry for entry in results
+                    if entry.user.lower() == username.lower()
+                ]
+            
+            if severity:
+                results = [
+                    entry for entry in results
+                    if entry.severity == severity
+                ]
+
+            if status:
+                results = [
+                    entry for entry in results
+                    if entry.status == status
+                ]
+
+            return results
+
+    def print_successful_logins(
+            self,
+            ip=None,
+            username=None,
+            severity=None,
+            status=None
+        ) -> None:
+        """
+        Prints filtered successful logins.
+        """
+
+        results = self.get_successful_logins(
+            ip=ip,
+            username=username,
+            severity=severity,
+            status=status
+        )
+
+        if not results:
+            print("\nNo successful logins found.")
+            return
+
+        print("\n=== Successful Logins ===")
+        print(f"\n   Total results: {len(results)}\n")
+
+        for entry in results:
+            print(
+                f"   User '{entry.user}' "
+                f"logged in from {entry.ip}"
+            )
+
     def get_total_failed_login_attempts(self) -> int:
         """
         Returns the total number of failed logins detected
@@ -132,7 +197,7 @@ class Statistics:
 
         total_suspicious_ips = self.get_total_suspicious_ips()
 
-        total_brute_force = len(self.detect_bruteforce())
+        total_brute_force = len(self.get_bruteforce())
 
         total_targeted_users = len(self.get_most_targeted_users())
 

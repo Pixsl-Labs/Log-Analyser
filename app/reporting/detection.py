@@ -5,13 +5,9 @@ from app.config import (
     TIME_WINDOW_SECONDS,
     SEVERITY_LEVEL
 )
-from app.log_analyser.log_analyser import LogAnalyser
 
 
 class Detection:
-    def __init__(self, analyser: LogAnalyser):
-        self.analyser = analyser
-
     def get_risk_level(self, count: int) -> str:
         """
         Returns the risk level based on the number of attempts
@@ -40,7 +36,7 @@ class Detection:
         else:
             return "LOW"
 
-    def detect_bruteforce(
+    def get_bruteforce(
             self,
             threshold=MAX_ATTEMPTS,
             window_seconds=TIME_WINDOW_SECONDS
@@ -78,7 +74,7 @@ class Detection:
         Prints detected brute force attacks.
         """
 
-        results = self.detect_bruteforce(
+        results = self.get_bruteforce(
             threshold,
             window_seconds
         )
@@ -125,7 +121,7 @@ class Detection:
         if not found:
             print("\nNo suspicious success detected.")
 
-    def detect_user_targeting(
+    def get_user_targeting(
             self,
             threshold=MAX_ATTEMPTS
         ):
@@ -158,7 +154,7 @@ class Detection:
         Prints distributed user-targeting attacks.
         """
 
-        results = self.detect_user_targeting(threshold)
+        results = self.get_user_targeting(threshold)
 
         if not results:
             print("\nNo user-targeted attacks detected.")
