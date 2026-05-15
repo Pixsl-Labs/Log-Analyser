@@ -1,6 +1,8 @@
 from app.log_analyser.log_entry import LogEntry
+from app.utils.filtering import filter_log_entries
 
 from datetime import time, datetime
+
 
 class Statistics:
     def get_failed_logins(
@@ -16,47 +18,15 @@ class Statistics:
         Returns filtered failed login attempts.
         """
 
-        results = self.analyser.failed_logins
-
-        if ip:
-            results = [
-                entry for entry in results
-                if entry.ip == ip
-            ]
-
-        if username:
-            results = [
-                entry for entry in results
-                if entry.user.lower() == username.lower()
-            ]
-        
-        if severity:
-            results = [
-                entry for entry in results
-                if entry.severity == severity
-            ]
-
-        if status:
-            results = [
-                entry for entry in results
-                if entry.status == status
-            ]
-
-        if start_time:
-            results = [
-                entry for entry in results
-                if entry.timestamp
-                and entry.timestamp.time() >= start_time
-            ]
-
-        if end_time:
-            results = [
-                entry for entry in results
-                if entry.timestamp
-                and entry.timestamp.time() <= end_time
-            ]
-
-        return results
+        return filter_log_entries(
+            self.analyser.failed_logins,
+            ip=ip,
+            username=username,
+            severity=severity,
+            status=status,
+            start_time=start_time,
+            end_time=end_time
+        )
     
     def print_failed_logins(
         self,
@@ -112,47 +82,15 @@ class Statistics:
         Returns filtered successful logins.
         """
 
-        results = self.analyser.successful_logins
-
-        if ip:
-            results = [
-                entry for entry in results
-                if entry.ip == ip
-            ]
-
-        if username:
-            results = [
-                entry for entry in results
-                if entry.user.lower() == username.lower()
-            ]
-        
-        if severity:
-            results = [
-                entry for entry in results
-                if entry.severity == severity
-            ]
-
-        if status:
-            results = [
-                entry for entry in results
-                if entry.status == status
-            ]
-        
-        if start_time:
-            results = [
-                entry for entry in results
-                if entry.timestamp
-                and entry.timestamp.time() >= start_time
-            ]
-
-        if end_time:
-            results = [
-                entry for entry in results
-                if entry.timestamp
-                and entry.timestamp.time() <= end_time
-            ]
-
-        return results
+        return filter_log_entries(
+            self.analyser.sucessful_logins,
+            ip=ip,
+            username=username,
+            severity=severity,
+            status=status,
+            start_time=start_time,
+            end_time=end_time
+        )
 
     def print_successful_logins(
         self,

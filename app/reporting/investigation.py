@@ -1,6 +1,7 @@
 from datetime import time, datetime
 
 from app.log_analyser.log_entry import LogEntry
+from app.utils.filtering import filter_log_entries
 
 class Investigation:    
     def get_suspicious_activity(
@@ -8,6 +9,7 @@ class Investigation:
         ip: str | None=None,
         username: str | None=None,
         severity: str | None=None,
+        status: str | None=None,
         start_time: time | None=None,
         end_time: time | None=None
     ) -> list[LogEntry]:
@@ -20,45 +22,22 @@ class Investigation:
             + self.analyser.successful_logins
         )
 
-        if ip:
-            results = [
-                entry for entry in results
-                if entry.ip == ip
-            ]
-
-        if username:
-            results = [
-                entry for entry in results
-                if entry.user.lower() == username.lower()
-            ]
-        
-        if severity:
-            results = [
-                entry for entry in results
-                if entry.severity == severity
-            ]
-
-        if start_time:
-            results = [
-                entry for entry in results
-                if entry.timestamp
-                and entry.timestamp.time() >= start_time
-            ]
-
-        if end_time:
-            results = [
-                entry for entry in results
-                if entry.timestamp
-                and entry.timestamp.time() <= end_time
-            ]
-
-        return results
+        return filter_log_entries(
+            results,
+            ip=ip,
+            username=username,
+            severity=severity,
+            status=status,
+            start_time=start_time,
+            end_time=end_time
+        )
     
     def print_suspicious_activity(
         self,
         ip: str | None=None,
         username: str | None=None,
         severity: str | None=None,
+        status: str | None=None,
         start_time: time | None=None,
         end_time: time | None=None
     ) -> None:
@@ -70,6 +49,7 @@ class Investigation:
             ip=ip,
             username=username,
             severity=severity,
+            status=status,
             start_time=start_time,
             end_time=end_time
         )
@@ -78,8 +58,7 @@ class Investigation:
             print("\nNo matching suspicious activity found.")
             return
         
-        print(f"\n=== Suspicious Activity ===\n")
-
+        print("\n=== Suspicious Activity ===\n")
         print(f"\n   Total events: {len(results)}\n")
 
         for entry in results:
@@ -94,9 +73,11 @@ class Investigation:
         self,
         ip: str | None=None,
         username: str | None=None,
+        severity: str | None=None,
+        status: str | None=None,
         start_time: time | None=None,
         end_time: time | None=None
-        ) -> list[LogEntry]:
+    ) -> list[LogEntry]:
         """
         Returns filtered activity timeline.
         """
@@ -106,41 +87,29 @@ class Investigation:
             + self.analyser.successful_logins
         )
 
-        if ip:
-            results = [
-                entry for entry in results
-                if entry.ip == ip
-            ]
-
-        if username:
-            results = [
-                entry for entry in results
-                if entry.user.lower() == username.lower()
-            ]
-
-        if start_time:
-            results = [
-                entry for entry in results
-                if entry.timestamp
-                and entry.timestamp.time() >= start_time
-            ]
-
-        if end_time:
-            results = [
-                entry for entry in results
-                if entry.timestamp
-                and entry.timestamp.time() <= end_time
-            ]
+        results = filter_log_entries(
+            results,
+            ip=ip,
+            username=username,
+            severity=severity,
+            status=status,
+            start_time=start_time,
+            end_time=end_time
+        )
 
         return sorted(
             results,
-            key=lambda entry: entry.timestamp or datetime.min
+            key=lambda entry: (
+                entry.timestamp or datetime.min
+            )
         )
     
     def print_activity_timeline(
         self,
         ip: str | None=None,
         username: str | None=None,
+        severity: str | None=None,
+        status: str | None=None,
         start_time: time | None=None,
         end_time: time | None=None
     ) -> None:
@@ -150,6 +119,8 @@ class Investigation:
         results = self.get_activity_timeline(
             ip=ip,
             username=username,
+            severity=severity,
+            status=status,
             start_time=start_time,
             end_time=end_time
         )
