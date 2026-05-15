@@ -1,5 +1,6 @@
 import logging
-from datetime import datetime
+
+from datetime import datetime, time
 
 def integer_validation(
         prompt, 
@@ -32,7 +33,7 @@ def integer_validation(
         print(f"Using default {label} ({default})\n")
         return default
     
-def get_time_range():
+def get_time_range() -> tuple[time | None, time | None]:
 
     use_time_filter = input(
         "\nApply time range? (y/n): "

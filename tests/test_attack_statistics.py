@@ -27,14 +27,14 @@ def test_attack_statistics_values_are_correct(brute_force_reporter):
     results = brute_force_reporter.get_attack_statistics()
 
     expected_results = {
-            "failed_attempts": 42,
-            "successful_logins": 4,
-            "suspicious_ips": 4,
-            "brute_force_alerts": 3,
-            "targeted_users": 4,
-            "highest_severity": "MEDIUM",
-            "top_attacker": "192.168.1.10 (18 attempts)",
-            "most_targeted_user": "root (18 attempts)"
+            "failed_attempts": 5,
+            "successful_logins": 1,
+            "suspicious_ips": 1,
+            "brute_force_alerts": 1,
+            "targeted_users": 1,
+            "highest_severity": "LOW",
+            "top_attacker": "192.168.1.10 (5 attempts)",
+            "most_targeted_user": "root (5 attempts)"
         }
     
     assert results == expected_results

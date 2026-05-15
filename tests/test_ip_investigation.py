@@ -10,7 +10,9 @@ def test_get_activity_by_ip_returns_results():
 
     reporter = LogReporter(analyser)
 
-    results = reporter.get_activity_by_ip(ip)
+    results = reporter.get_activity_timeline(
+        ip=ip
+    )
 
     assert len(results) > 0
     assert all(entry.ip == ip for entry in results)
@@ -24,7 +26,9 @@ def test_get_activity_by_ip_includes_failed_logins():
 
     reporter = LogReporter(analyser)
 
-    results = reporter.get_activity_by_ip(ip)
+    results = reporter.get_activity_timeline(
+        ip=ip
+    )
 
     assert any(entry.status == "FAILED" for entry in results)
 
@@ -37,7 +41,9 @@ def test_get_activity_by_ip_includes_successful_logins():
 
     reporter = LogReporter(analyser)
 
-    results = reporter.get_activity_by_ip(ip)
+    results = reporter.get_activity_timeline(
+        ip=ip
+    )
 
     assert any(entry.status == "SUCCESS" for entry in results)
 
@@ -50,6 +56,8 @@ def test_get_activity_by_ip_no_results():
 
     reporter = LogReporter(analyser)
 
-    results = reporter.get_activity_by_ip(ip)
+    results = reporter.get_activity_timeline(
+        ip=ip
+    )
 
     assert not results

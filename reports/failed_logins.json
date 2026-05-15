@@ -1,0 +1,300 @@
+{
+    "generated_at": "2026-05-15 11:01:19",
+    "title": "Failed Logins",
+    "results": [
+        {
+            "ip": "192.168.1.10",
+            "user": "admin",
+            "timestamp": "2024-06-10 12:00:01",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "192.168.1.10",
+            "user": "admin",
+            "timestamp": "2024-06-10 12:00:02",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "192.168.1.10",
+            "user": "admin",
+            "timestamp": "2024-06-10 12:00:03",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "192.168.1.10",
+            "user": "admin",
+            "timestamp": "2024-06-10 12:00:04",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "192.168.1.10",
+            "user": "admin",
+            "timestamp": "2024-06-10 12:00:05",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "192.168.1.10",
+            "user": "admin",
+            "timestamp": "2024-06-10 12:00:06",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "192.168.1.20",
+            "user": "user",
+            "timestamp": "2024-06-10 12:05:10",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "192.168.1.20",
+            "user": "user",
+            "timestamp": "2024-06-10 12:06:15",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "10.0.0.5",
+            "user": "guest",
+            "timestamp": "2024-06-11 09:00:01",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "10.0.0.5",
+            "user": "guest",
+            "timestamp": "2024-06-11 09:00:02",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "10.0.0.5",
+            "user": "guest",
+            "timestamp": "2024-06-11 09:00:03",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "10.0.0.5",
+            "user": "guest",
+            "timestamp": "2024-06-11 09:00:04",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "10.0.0.5",
+            "user": "guest",
+            "timestamp": "2024-06-11 09:00:05",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "172.16.0.2",
+            "user": "root",
+            "timestamp": "2024-06-12 14:30:01",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "172.16.0.2",
+            "user": "root",
+            "timestamp": "2024-06-12 14:30:02",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "172.16.0.2",
+            "user": "root",
+            "timestamp": "2024-06-12 14:30:03",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "172.16.0.2",
+            "user": "root",
+            "timestamp": "2024-06-12 14:30:07",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "172.16.0.2",
+            "user": "root",
+            "timestamp": "2024-06-12 14:30:08",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "172.16.0.2",
+            "user": "root",
+            "timestamp": "2024-06-12 14:30:09",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "192.168.1.10",
+            "user": "root",
+            "timestamp": "2024-01-10 12:00:01",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "192.168.1.10",
+            "user": "root",
+            "timestamp": "2024-01-10 12:00:02",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "192.168.1.10",
+            "user": "root",
+            "timestamp": "2024-01-10 12:00:03",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "192.168.1.10",
+            "user": "root",
+            "timestamp": "2024-01-10 12:00:04",
+            "status": "FAILED",
+            "severity": "MEDIUM"
+        },
+        {
+            "ip": "192.168.1.10",
+            "user": "root",
+            "timestamp": "2024-01-10 12:00:05",
+            "status": "FAILED",
+            "severity": "MEDIUM"
+        },
+        {
+            "ip": "192.168.1.10",
+            "user": "root",
+            "timestamp": "2024-01-10 12:00:06",
+            "status": "FAILED",
+            "severity": "MEDIUM"
+        },
+        {
+            "ip": "192.168.1.10",
+            "user": "root",
+            "timestamp": "2024-01-10 12:00:07",
+            "status": "FAILED",
+            "severity": "MEDIUM"
+        },
+        {
+            "ip": "192.168.1.10",
+            "user": "root",
+            "timestamp": "2024-01-10 12:00:08",
+            "status": "FAILED",
+            "severity": "MEDIUM"
+        },
+        {
+            "ip": "192.168.1.10",
+            "user": "root",
+            "timestamp": "2024-01-10 12:00:09",
+            "status": "FAILED",
+            "severity": "MEDIUM"
+        },
+        {
+            "ip": "192.168.1.10",
+            "user": "root",
+            "timestamp": "2024-01-10 12:00:10",
+            "status": "FAILED",
+            "severity": "MEDIUM"
+        },
+        {
+            "ip": "192.168.1.10",
+            "user": "root",
+            "timestamp": "2024-01-10 12:00:11",
+            "status": "FAILED",
+            "severity": "MEDIUM"
+        },
+        {
+            "ip": "192.168.1.10",
+            "user": "root",
+            "timestamp": "2024-01-10 12:00:12",
+            "status": "FAILED",
+            "severity": "MEDIUM"
+        },
+        {
+            "ip": "10.0.0.5",
+            "user": "admin",
+            "timestamp": "2024-01-10 12:01:01",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "10.0.0.5",
+            "user": "admin",
+            "timestamp": "2024-01-10 12:01:02",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "10.0.0.5",
+            "user": "admin",
+            "timestamp": "2024-01-10 12:01:03",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "10.0.0.5",
+            "user": "admin",
+            "timestamp": "2024-01-10 12:01:04",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "10.0.0.5",
+            "user": "admin",
+            "timestamp": "2024-01-10 12:01:05",
+            "status": "FAILED",
+            "severity": "MEDIUM"
+        },
+        {
+            "ip": "10.0.0.5",
+            "user": "admin",
+            "timestamp": "2024-01-10 12:01:06",
+            "status": "FAILED",
+            "severity": "MEDIUM"
+        },
+        {
+            "ip": "10.0.0.5",
+            "user": "admin",
+            "timestamp": "2024-01-10 12:01:07",
+            "status": "FAILED",
+            "severity": "MEDIUM"
+        },
+        {
+            "ip": "10.0.0.5",
+            "user": "admin",
+            "timestamp": "2024-01-10 12:01:08",
+            "status": "FAILED",
+            "severity": "MEDIUM"
+        },
+        {
+            "ip": "10.0.0.5",
+            "user": "admin",
+            "timestamp": "2024-01-10 12:01:09",
+            "status": "FAILED",
+            "severity": "MEDIUM"
+        },
+        {
+            "ip": "10.0.0.5",
+            "user": "admin",
+            "timestamp": "2024-01-10 12:01:10",
+            "status": "FAILED",
+            "severity": "MEDIUM"
+        },
+        {
+            "ip": "10.0.0.5",
+            "user": "admin",
+            "timestamp": "2024-01-10 12:01:11",
+            "status": "FAILED",
+            "severity": "MEDIUM"
+        }
+    ]
+}

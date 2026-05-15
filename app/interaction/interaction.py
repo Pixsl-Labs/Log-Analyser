@@ -174,12 +174,82 @@ class Interaction:
             # === Configuration ===
 
             elif choice == "15":
-                file_path = input("Enter report file path (.txt/.json): ")
-                file_path = os.path.join("reports", file_path)
-                if file_path.endswith(".txt"):                 
-                    self.reporter.export_txt(file_path)
-                elif file_path.endswith(".json"):                 
-                    self.reporter.export_json(file_path)
+
+                print("\n=== Export Options ===\n")
+                print("1. Failed Logins")
+                print("2. Successful Logins")
+                print("3. Activity Timeline")
+
+                export_choice = input(
+                    "\nSelect export option: "
+                ).strip()
+
+                data = []
+                title = ""
+
+                if export_choice == "1":
+
+                    severity = input(
+                        "\nSeverity filter (optional): "
+                    ).strip().upper()
+
+                    severity = severity if severity else None
+
+                    data = self.reporter.get_failed_logins(
+                        severity=severity
+                    )
+
+                    title = "Failed Logins"
+
+                elif export_choice == "2":
+
+                    data = self.reporter.get_successful_logins()
+
+                    title = "Successful Logins"
+
+                elif export_choice == "3":
+
+                    start_time, end_time = get_time_range()
+
+                    data = self.reporter.get_activity_timeline(
+                        start_time=start_time,
+                        end_time=end_time
+                    )
+
+                    title = "Activity Timeline"
+
+                else:
+                    print("\nInvalid export option.")
+                    continue
+
+                file_path = input(
+                    "\nEnter report filename (.txt/.json): "
+                ).strip()
+
+                file_path = os.path.join(
+                    "reports",
+                    file_path
+                )
+
+                if file_path.endswith(".txt"):
+
+                    self.reporter.export_txt(
+                        file_path,
+                        title,
+                        data
+                    )
+
+                elif file_path.endswith(".json"):
+
+                    self.reporter.export_json(
+                        file_path,
+                        title,
+                        data
+                    )
+
+                else:
+
+                    print("\nInvalid file extension.")
 
             elif choice == "16":
                 file_path = input("Enter log file path: ")

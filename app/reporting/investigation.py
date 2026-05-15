@@ -169,9 +169,10 @@ class Investigation:
             )
 
             print(
-                f"   [{entry.status}] "
-                f"{time_str} "
-                f"{entry.user} from {entry.ip}"
+                f"   [{entry.status:<7}] "
+                f"{time_str:<20} "
+                f"{entry.user:<12} "
+                f"{entry.ip}"
             )
 
     def print_all_usernames(self) -> None:

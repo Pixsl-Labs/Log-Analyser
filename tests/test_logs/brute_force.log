@@ -1,0 +1,6 @@
+Jun 10 2024 12:00:01 server sshd[1001]: Failed password for root from 192.168.1.10 port 22 ssh2
+Jun 10 2024 12:00:02 server sshd[1002]: Failed password for root from 192.168.1.10 port 22 ssh2
+Jun 10 2024 12:00:03 server sshd[1003]: Failed password for root from 192.168.1.10 port 22 ssh2
+Jun 10 2024 12:00:04 server sshd[1004]: Failed password for root from 192.168.1.10 port 22 ssh2
+Jun 10 2024 12:00:05 server sshd[1005]: Failed password for root from 192.168.1.10 port 22 ssh2
+Jun 10 2024 12:01:00 server sshd[1006]: Accepted password for root from 192.168.1.10 port 22 ssh2

@@ -168,7 +168,7 @@ class Detection:
             print(
                 f"   {user} targeted by "
                 f"{unique_ips} IPs "
-                f"({total_attempts}) attempts "
+                f"({total_attempts} attempts )"
                 f"[{severity}]"
             )
 
@@ -176,7 +176,7 @@ class Detection:
         self,
         ip: str | None=None,
         severity: str | None=None,
-    ) -> list:
+    ) -> list[tuple[str, str]]:
         """
         Returns filtered suspicious IP addresses.
         """
@@ -234,8 +234,8 @@ class Detection:
             status = self.get_risk_level(count)
 
             print(
-                f"   {current_ip} ->"
-                f"{count} attempts "
+                f"   {current_ip:<15} ->"
+                f"{count:<3} attempts "
                 f"({status}) "
                 f"[{current_severity}]"
             )

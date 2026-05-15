@@ -1,0 +1,4 @@
+Jun 10 2024 14:00:01 server sshd[4001]: Failed password for root from 192.168.1.20 port 22 ssh2
+Jun 10 2024 14:00:02 server sshd[4002]: Failed password for admin port 22 ssh2
+BAD TIMESTAMP server sshd[4003]: Failed password for test from 192.168.1.30 port 22 ssh2
+Jun 10 2024 14:00:03 server sshd[4004]: Accepted password for sam from 192.168.1.40 port 22 ssh2

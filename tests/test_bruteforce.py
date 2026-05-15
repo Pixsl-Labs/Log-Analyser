@@ -7,7 +7,7 @@ def test_brute_force_detected():
 
     reporter = LogReporter(analyser)
 
-    results = reporter.detect_bruteforce(5, 10)
+    results = reporter.get_bruteforce(5, 10)
 
     assert len(results) > 0
 
@@ -17,6 +17,6 @@ def test_no_brute_force_detected():
 
     reporter = LogReporter(analyser)
 
-    results = reporter.detect_bruteforce(5, 10)
+    results = reporter.get_bruteforce(5, 10)
 
     assert len(results) == 0

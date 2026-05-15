@@ -1,6 +1,6 @@
 from app.log_analyser.log_entry import LogEntry
 
-from datetime import time
+from datetime import time, datetime
 
 class Statistics:
     def get_failed_logins(
@@ -84,13 +84,19 @@ class Statistics:
             print("\nNo matching failed logins found.")
             return
         
+        results = sorted(
+            results,
+            key=lambda entry: entry.timestamp or datetime.min
+        )
+        
         print("\n=== Failed Login Results ===")
         print(f"\n   Total results: {len(results)}\n")
 
         for entry in results:
             print(
-                f"   {entry.user} failed login "
-                f"from {entry.ip}"
+                f"   [{entry.severity:<6}] "
+                f"{entry.user:<12} "
+                f"{entry.ip}"
             )
 
     def get_successful_logins(
@@ -173,14 +179,28 @@ class Statistics:
         if not results:
             print("\nNo successful logins found.")
             return
+        
+        results = sorted(
+            results,
+            key=lambda entry: entry.timestamp or datetime.min
+        )
 
         print("\n=== Successful Logins ===")
         print(f"\n   Total results: {len(results)}\n")
 
         for entry in results:
+
+            time_str = (
+                entry.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+                if entry.timestamp
+                else "Unknown"
+            )
+
             print(
-                f"   User '{entry.user}' "
-                f"logged in from {entry.ip}"
+                f"   [{entry.status:<7}] "
+                f"{time_str:<20} "
+                f"{entry.user:<12} "
+                f"{entry.ip}"
             )
 
     def get_total_failed_login_attempts(self) -> int:

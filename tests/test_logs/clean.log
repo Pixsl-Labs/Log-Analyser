@@ -1,0 +1,2 @@
+Jun 10 2024 12:00:01 server sshd[2001]: Accepted password for sam from 10.0.0.1 port 22 ssh2
+Jun 10 2024 12:05:01 server sshd[2002]: Accepted password for admin from 10.0.0.2 port 22 ssh2

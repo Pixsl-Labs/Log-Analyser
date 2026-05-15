@@ -1,0 +1,41 @@
+{
+    "generated_at": "2026-05-15 11:37:36",
+    "title": "Failed Logins",
+    "results": [
+        {
+            "ip": "192.168.1.10",
+            "user": "root",
+            "timestamp": "2024-06-10 12:00:01",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "192.168.1.10",
+            "user": "root",
+            "timestamp": "2024-06-10 12:00:02",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "192.168.1.10",
+            "user": "root",
+            "timestamp": "2024-06-10 12:00:03",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "192.168.1.10",
+            "user": "root",
+            "timestamp": "2024-06-10 12:00:04",
+            "status": "FAILED",
+            "severity": "LOW"
+        },
+        {
+            "ip": "192.168.1.10",
+            "user": "root",
+            "timestamp": "2024-06-10 12:00:05",
+            "status": "FAILED",
+            "severity": "LOW"
+        }
+    ]
+}

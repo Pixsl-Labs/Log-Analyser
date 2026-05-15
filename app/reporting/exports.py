@@ -1,17 +1,27 @@
 import json
+
 from datetime import datetime
+
+from dataclasses import asdict, is_dataclass
 
 
 class Export:
-    def export_txt(self, filename: str) -> None:
+
+    def export_txt(
+        self,
+        filename: str,
+        title: str,
+        data: list
+    ) -> None:
         """
-        Exports analysis results to TXT format.
+        Exports filtered results to TXT format.
         """
 
         now = datetime.now()
 
         with open(filename, "w") as f:
-            f.write("=== Log Analysis Report ===\n\n")
+
+            f.write(f"=== {title} ===\n\n")
 
             f.write(
                 now.strftime(
@@ -19,31 +29,65 @@ class Export:
                 )
             )
 
-            stats = self.get_attack_statistics()
+            if not data:
+                f.write("No results found.\n")
 
-            for key, value in stats.items():
-                f.write(f"{key}: {value}\n")
+            else:
+                for item in data:
+                    if hasattr(item, "ip"):
 
-        print(f"TXT report exported to {filename}")
+                        timestamp = (
+                            item.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+                            if item.timestamp
+                            else "Unknown"
+                        )
 
-    def export_json(self, filename: str) -> None:
+                        f.write(
+                            f"[{item.status:<7}] "
+                            f"{timestamp} "
+                            f"{item.user:<12} "
+                            f"{item.ip:<15} "
+                            f"[{item.severity}]\n"
+                        )
+
+                    else:
+                        f.write(f"{item}\n")
+
+        print(f"\nTXT report exported to {filename}")
+
+    def export_json(
+        self,
+        filename: str,
+        title: str,
+        data: list
+    ) -> None:
         """
-        Exports analysis results in structured JSON format.
+        Exports filtered results to JSON format.
         """
 
         now = datetime.now()
 
-        data = {
-            "generated_at": now.strftime("%Y-%m-%d %H:%M:%S"),
-            "summary": self.get_attack_statistics(),
-            "suspicious_ips": [
-                {"ip": ip, "attempts": count}
-                for ip, count
-                in self.analyser.failed_ip_counts.items()
+        export_data = {
+            "generated_at": now.strftime(
+                "%Y-%m-%d %H:%M:%S"
+            ),
+            "title": title,
+            "results": [
+                {
+                    key: (
+                        value.strftime("%Y-%m-%d %H:%M:%S")
+                        if isinstance(value, datetime)
+                        else value
+                    )
+                    for key, value in asdict(item).items()
+                }
+                if is_dataclass(item)
+                else item
+                for item in data
             ]
         }
 
         with open(filename, "w") as f:
-            json.dump(data, f, indent=4)
+            json.dump(export_data, f, indent=4)
 
-        print(f"JSON report exported to {filename}")
+        print(f"\nJSON report exported to {filename}")

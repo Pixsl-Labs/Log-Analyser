@@ -7,7 +7,7 @@ def test_user_targeting_detected():
 
     reporter = LogReporter(analyser)
 
-    results = reporter.detect_user_targeting(5)
+    results = reporter.get_user_targeting(5)
 
     assert len(results) > 0
 
@@ -17,6 +17,6 @@ def test_no_user_targeting_detected():
     
     reporter = LogReporter(analyser)
 
-    results = reporter.detect_user_targeting(5)
+    results = reporter.get_user_targeting(5)
 
     assert len(results) == 0
