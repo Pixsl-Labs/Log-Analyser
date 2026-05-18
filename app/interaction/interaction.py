@@ -7,6 +7,9 @@ from app.interaction.filters import integer_validation, handle_filter_menu, get_
 from app.interaction.configuration import configure
 
 import os
+from colorama import Fore
+from datetime import datetime
+
 
 class Interaction:
     """
@@ -40,18 +43,37 @@ class Interaction:
 
             if choice == "1":
                 current_config(self.threshold, self.window_seconds)
-                print("\n=== Log Analysis Report ===\n")
+                print(
+                    Fore.GREEN
+                    + "\n=== Log Analysis Report ===\n"
+                )
+
+                now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+                print(
+                    Fore.CYAN
+                    + f"Generated: {now}\n"
+                )
 
                 if not self.analyser.failed_logins and not self.analyser.successful_logins:
                     print("Log file contained no relevant login activity.\n")
 
-                print("=== Attention Needed ===\n")
+                print(
+                    Fore.LIGHTRED_EX
+                    + "=== Attention Needed ===\n"
+                )
 
                 total_ips = self.reporter.get_total_number_of_unique_ip_addresses()
-                print(f"Number of unique IPs: {total_ips}\n")
+                print(
+                    Fore.CYAN
+                    + f"Number of unique IPs: {total_ips}\n"
+                )
 
                 total = self.reporter.get_total_failed_login_attempts()
-                print(f"Total number of failed logins: {total}")
+                print(
+                    Fore.CYAN
+                    + f"Total number of failed logins: {total}"
+                )
 
                 self.reporter.print_suspicious_ips()
 
@@ -65,12 +87,23 @@ class Interaction:
 
                 self.reporter.print_user_targeting(self.threshold)
 
-                print("\n=== Standard Logins ===\n")
+                print(
+                    Fore.CYAN
+                    + "\n=== Standard Logins ===\n"
+                )
 
                 total_ = self.reporter.get_total_successful_logins()
-                print(f"Total number of successful logins: {total_}")
+                print(
+                    Fore.LIGHTCYAN_EX
+                    + f"Total number of successful logins: {total_}"
+                )                
 
                 self.reporter.print_successful_logins()
+                
+                print(
+                    Fore.MAGENTA
+                    + "\n=== End of Report ==="
+                )
 
             elif choice == "2":
                 self.reporter.print_attack_summary()

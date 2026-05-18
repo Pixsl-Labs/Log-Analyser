@@ -1,15 +1,27 @@
+# Activating virutal environment
 # source venv/bin/activate
+
+# Standard running command for personal testing
+# python3 -m app.main brute_force.log
+
 
 import argparse
 import os
 import logging
+from colorama import init
 
-logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(levelname)s: %(message)s"
+)
+
+init(autoreset=True)
 
 from app.interaction.interaction import Interaction
 
 from app.log_analyser.log_analyser import LogAnalyser
 from app.log_analyser.log_reporter import LogReporter
+
 
 def run_cli(args):
     analyser = LogAnalyser()

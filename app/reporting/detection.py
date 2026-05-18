@@ -1,10 +1,12 @@
 from collections import defaultdict
+from colorama import Fore
 
 from app.config import (
     MAX_ATTEMPTS,
     TIME_WINDOW_SECONDS,
     SEVERITY_LEVEL
 )
+from app.utils.colours import get_severity_colour, get_status_colour
 
 
 class Detection:
@@ -80,18 +82,31 @@ class Detection:
         )
 
         if not results:
-            print("\nNo brute force activity detected")
+            print(
+                Fore.LIGHTRED_EX
+                + "\nNo brute force activity detected."
+            )
+
             return
 
-        print("\n=== Brute Force Detected ===\n")
+        print(
+            Fore.YELLOW
+            + "\n=== Brute Force Detected ===\n"
+        )
+
+        print(
+            Fore.CYAN
+            + f"   Total number of brute force attempts detected: {len(results)}\n"
+        )
 
         for ip, attempts, diff in results:
             severity = self.get_severity_level(attempts)
 
             print(
-                f"   {ip} -> "
-                f"{attempts} attempts in {diff}s "
-                f"(threshold={threshold}) "
+                f"{Fore.LIGHTRED_EX}"
+                f"   {ip:<12} -> "
+                f"{attempts:<2} attempts "
+                f"in {diff:>3.1f}s "
                 f"[{severity}]"
             )
 
@@ -100,26 +115,43 @@ class Detection:
         Detects successful logins following failed attempts.
         """
 
-        failed_ips = set(
+        failed_ips = {
             entry.ip
             for entry in self.analyser.failed_logins
+        }
+
+        matching_ips = {
+            entry.ip
+            for entry in self.analyser.successful_logins
+            if entry.ip in failed_ips
+        }
+
+        if not matching_ips:
+            print(
+                Fore.LIGHTRED_EX
+                + "\nNo suspicious success detected."
+            )
+
+            return
+
+        print(
+            Fore.YELLOW
+            + "\n=== IPs with Success After Failure ==="
         )
 
-        found = False
+        print(
+            Fore.CYAN
+            + f"\n   Total matching IPs: "
+            f"{len(matching_ips)}\n"
+        )
 
-        for entry in self.analyser.successful_logins:
-            if entry.ip in failed_ips:
-                if not found:
-                    print("\n=== IPs with Success After Failure ===\n")
-                    found = True
+        for ip in sorted(matching_ips):
 
-                print(
-                    f"   {entry.ip} successfully "
-                    f"logged in after failures"
-                )
-
-        if not found:
-            print("\nNo suspicious success detected.")
+            print(
+                f"{Fore.YELLOW}"
+                f"   {ip:<12} -> "
+                f"Successful login after failures"
+            )
 
     def get_user_targeting(
             self,
@@ -157,10 +189,19 @@ class Detection:
         results = self.get_user_targeting(threshold)
 
         if not results:
-            print("\nNo user-targeted attacks detected.")
+            print(
+                Fore.LIGHTRED_EX
+                + "\nNo user-targeted attacks detected."
+            )
+
             return
 
         print("\n=== User Targeted Attacks Detected ===\n")
+
+        print(
+            Fore.CYAN
+            + f"   Total number of targeted users: {len(results)}\n"
+        )
 
         for user, unique_ips, total_attempts in results:
             severity = self.get_severity_level(unique_ips)
@@ -224,18 +265,36 @@ class Detection:
         )
 
         if not results:
-            print("\nNo suspicious IPs found.")
+            print(
+                Fore.LIGHTRED_EX
+                + "\nNo suspicious IPs found."
+            )
             return
         
-        print("\n=== Suspicious IPs (Failed Attempts) ===\n")
+        print(
+            Fore.YELLOW
+            + "\n=== Suspicious IPs (Failed Attempts) ===\n"
+        )
+
+        print(
+            Fore.CYAN
+            + f"   Total number of suspicious IPs: {len(results)}\n"
+        )
 
         for current_ip, count, current_severity in results:
 
             status = self.get_risk_level(count)
 
+            severity_colour = (
+                get_severity_colour(
+                    current_severity
+                )
+            )
+
             print(
-                f"   {current_ip:<15} -> "
-                f"{count:<3} attempts "
-                f"({status}) "
-                f"[{current_severity}]"
+                f"   {current_ip:<12} -> "
+                f"{count:<2} attempts "
+                f"({status:^11}) "
+                f"{severity_colour}"
+                f"[{current_severity:^8}]"
             )

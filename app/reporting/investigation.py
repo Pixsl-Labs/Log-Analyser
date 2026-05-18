@@ -1,7 +1,10 @@
 from datetime import time, datetime
+from colorama import Fore
 
 from app.log_analyser.log_entry import LogEntry
 from app.utils.filtering import filter_log_entries
+from app.utils.colours import get_status_colour, get_severity_colour
+
 
 class Investigation:    
     def get_suspicious_activity(
@@ -58,15 +61,41 @@ class Investigation:
             print("\nNo matching suspicious activity found.")
             return
         
-        print("\n=== Suspicious Activity ===\n")
-        print(f"\n   Total events: {len(results)}\n")
+        print(
+            Fore.GREEN
+            + "\n=== Suspicious Activity ==="
+        )
+
+        print(
+            Fore.CYAN
+            + f"\n   Total events: {len(results)}\n"
+        )
 
         for entry in results:
+            time_str = (
+                entry.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+                if entry.timestamp
+                else "Unknown"
+            )
+
+            status_colour = get_status_colour(
+                entry.status
+            )
+
+            severity_colour = get_severity_colour(
+                entry.severity
+            )
+
             print(
-                f"   [{entry.status}] "
-                f"{entry.user} "
-                f"from {entry.ip} "
-                f"at {entry.timestamp}"
+                f"   "
+                f"{status_colour}"
+                f"[{entry.status:^9}] "
+                f"{time_str:<20} "
+                f"{entry.user:<7} "
+                f"{entry.ip:<13} "
+                f"{Fore.RESET}"
+                f"{severity_colour}"
+                f"[{entry.severity:^8}]"
             )
 
     def get_activity_timeline(
@@ -129,8 +158,15 @@ class Investigation:
             print("\nNo matching activity timeline found.")
             return
         
-        print("\n=== Activity Timeline ===\n")
-        print(f"\n   Total events: {len(results)}\n")
+        print(
+            Fore.GREEN
+            + "\n=== Activity Timeline ==="
+        )
+
+        print(
+            Fore.CYAN
+            + f"\n   Total events: {len(results)}\n"
+        )
 
         for entry in results:
             time_str = (
@@ -139,12 +175,23 @@ class Investigation:
                 else "Unknown"
             )
 
+            status_colour = get_status_colour(
+                entry.status
+            )
+
             print(
-                f"   [{entry.status:<7}] "
+                f"   "
+                f"{status_colour}"
+                f"[{entry.status:^9}] "
                 f"{time_str:<20} "
-                f"{entry.user:<12} "
+                f"{entry.user:<7} "
                 f"{entry.ip}"
             )
+
+        print(
+            Fore.MAGENTA
+            + "\n=== End of Report ==="
+        )
 
     def print_all_usernames(self) -> None:
         """

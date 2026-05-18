@@ -1,4 +1,8 @@
+from datetime import datetime
+from colorama import Fore
+
 from app.config import MAX_ATTEMPTS
+from app.utils.colours import get_attempt_colour
 
 
 class Summary:
@@ -7,50 +11,110 @@ class Summary:
         Prints a high-level summary of detected threats.
         """
 
-        print("\n=== Attack Summary ===\n")
+        print(
+            Fore.GREEN
+            + "\n=== Attack Summary ===\n"
+        )
+
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        print(
+            Fore.CYAN
+            + f"Generated: {now}\n"
+        )
 
         total_failed = (
             self.get_total_failed_login_attempts()
         )
 
-        print(f"Total failed attempts: {total_failed}")
+        failed_colour = get_attempt_colour(
+            total_failed
+        )
+
+        print(
+            f"{'Total failed attempts:':<25} "
+            f"{failed_colour}"
+            f"{total_failed if total_failed else 'None'}"
+        )
 
         if self.analyser.failed_logins:
-            top_ip = max(
+
+            top_ip, attempts = max(
                 self.analyser.failed_ip_counts.items(),
                 key=lambda x: x[1]
             )
 
+            attacker_colour = get_attempt_colour(
+                attempts
+            )
+
             print(
-                f"Top attacking IP: "
-                f"{top_ip[0]} ({top_ip[1]} attempts)"
+                f"{'Top attacking IP:':<25} "
+                f"{attacker_colour}"
+                f"{top_ip} ({attempts} attempts)"
             )
 
         else:
-            print("Top attacking IP: None")
+
+            print(
+                f"{'Top attacking IP:':<25} "
+                f"{Fore.LIGHTBLACK_EX}"
+                f"None"
+            )
 
         targeted = self.get_user_targeting()
 
         if targeted:
+
             top_user, unique_ips, attempts = targeted[0]
 
+            targeted_colour = get_attempt_colour(
+                attempts
+            )
+
             print(
-                f"Most targeted user: "
-                f"{top_user} ({attempts} attempts from {unique_ips} IPs)"
+                f"{'Most targeted user:':<25} "
+                f"{targeted_colour}"
+                f"{top_user} "
+                f"({attempts} attempts from "
+                f"{unique_ips} IPs)"
             )
 
         else:
-            print("Most targeted user: None")
+
+            print(
+                f"{'Most targeted user:':<25} "
+                f"{Fore.LIGHTBLACK_EX}"
+                f"None"
+            )
 
         brute = self.get_bruteforce()
 
-        print(f"Brute-force alerts: {len(brute)}")
+        brute_colour = get_attempt_colour(
+            len(brute)
+        )
+
+        print(
+            f"{'Brute-force alerts:':<25} "
+            f"{brute_colour}"
+            f"{len(brute) if brute else 'None'}"
+        )
 
         targeting = self.get_user_targeting(
             MAX_ATTEMPTS
         )
 
+        targeting_colour = get_attempt_colour(
+            len(targeting)
+        )
+
         print(
-            f"User-targeting alerts: "
-            f"{len(targeting)}"
+            f"{'User-targeting alerts:':<25} "
+            f"{targeting_colour}"
+            f"{len(targeting) if targeting else 'None'}"
+        )
+
+        print(
+            Fore.MAGENTA
+            + "\n=== End of Report ==="
         )
