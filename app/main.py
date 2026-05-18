@@ -1,6 +1,9 @@
 # Activating virutal environment
 # source venv/bin/activate
 
+# Instantly pull all installed modules into requirements.txt
+# pip freeze > requirements.txt
+
 # Standard running command for personal testing
 # python3 -m app.main brute_force.log
 
